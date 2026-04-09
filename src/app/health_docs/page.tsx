@@ -15,7 +15,7 @@ export default async function HealthDocsPage() {
                     Your medical documents
                 </h1>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Browse every PDF from the shared folder and open it in a dedicated viewer.
+                    Browse your medical records
                 </p>
             </div>
 
