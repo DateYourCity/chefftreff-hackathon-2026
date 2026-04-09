@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider";
 import { BottomNav, Navbar } from "@/components/ui/navbar";
 
 const manrope = Manrope({
@@ -35,26 +34,18 @@ export default function RootLayout({
     return (
         <html lang="de" suppressHydrationWarning>
             <body className={manrope.variable} suppressHydrationWarning>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="light"
-                    enableSystem={false}
-                    forcedTheme="light"
-                    disableTransitionOnChange
-                >
-                    <div className="app-shell">
-                        <div className="device-frame">
-                            <div className="device-notch" aria-hidden="true" />
-                            <div className="device-screen">
-                                <Navbar />
-                                <div className="flex-1 min-h-0 overflow-y-auto">
-                                    {children}
-                                </div>
-                                <BottomNav />
+                <div className="app-shell">
+                    <div className="device-frame">
+                        <div className="device-notch" aria-hidden="true" />
+                        <div className="device-screen">
+                            <Navbar />
+                            <div className="flex-1 min-h-0 overflow-y-auto">
+                                {children}
                             </div>
+                            <BottomNav />
                         </div>
                     </div>
-                </ThemeProvider>
+                </div>
             </body>
         </html>
     );

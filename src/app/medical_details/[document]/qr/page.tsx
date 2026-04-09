@@ -1,9 +1,8 @@
 import { headers } from "next/headers";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { toDataURL } from "qrcode";
 import { getHealthDocs } from "@/lib/health-docs";
+import { QrReturnLink } from "./qr-return-link";
 
 export async function generateStaticParams() {
     const docs = await getHealthDocs();
@@ -40,22 +39,10 @@ export default async function MedicalDocumentQrPage(
     });
 
     return (
-        <section className="fixed inset-0 z-[120] flex flex-col bg-white">
+        <section className="fixed inset-0 z-[120] flex flex-col bg-white animate-in fade-in duration-300">
             <div className="flex-1 bg-white" />
-            <div className="mx-auto w-full max-w-[58vw] sm:max-w-[50vw]">
-                <Link
-                    href={documentHref}
-                    aria-label={`Open ${doc.label}`}
-                    className="block"
-                >
-                    <Image
-                        src={qrSource}
-                        alt={`QR code to open ${doc.label}`}
-                        width={1400}
-                        height={1400}
-                        className="h-auto w-full cursor-pointer"
-                    />
-                </Link>
+            <div className="mx-auto w-full max-w-[58vw] animate-in fade-in zoom-in-95 duration-500 delay-75 sm:max-w-[50vw]">
+                <QrReturnLink href={documentHref} imageSrc={qrSource} label={doc.label} />
             </div>
             <div className="flex-1 bg-white" />
         </section>

@@ -3,6 +3,7 @@
 import userData from "@/app/chat/user_data.json";
 import SimpleDAEViewer from "@/components/three-avatar";
 import { Button } from "@/components/ui/button";
+import { formatShortUtcDate } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -70,13 +71,19 @@ const toneStyles: Record<InsightTone, { badge: string; bar: string; label: strin
     },
 };
 
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+function formatNumber(value: number): string {
+    return numberFormatter.format(value);
+}
+
 const animationOptions = [
     { id: "neutral-idle", label: "Neutral Idle", modelPath: "/models/Neutral Idle.dae" },
     { id: "sad-walk", label: "Sad Walk", modelPath: "/models/Sad Walk.dae" },
     { id: "walking", label: "Walking", modelPath: "/models/Walking.dae" },
 ] as const;
 
-export default function HomePage() {
+export default function Sheet() {
     const [activeAnimationId, setActiveAnimationId] = useState<(typeof animationOptions)[number]["id"]>("walking");
     const [sheetOffset, setSheetOffset] = useState(280);
     const [sheetTravel, setSheetTravel] = useState(280);
@@ -87,20 +94,13 @@ export default function HomePage() {
     const dragStartOffsetRef = useRef(0);
     const currentOffsetRef = useRef(280);
 
-    const activeAnimation = useMemo(
-        () => animationOptions.find((option) => option.id === activeAnimationId) ?? animationOptions[2],
-        [activeAnimationId]
-    );
-
     const healthInsights = useMemo(() => {
         const wearTable = userData.wear as CompactTable;
         const wearRows = wearTable.v;
         const latestIndex = Math.max(wearRows.length - 1, 0);
         const latest = tableRowToRecord(wearTable, latestIndex);
         const recentRows = wearRows.slice(-7);
-        const latestDate = latest.date
-            ? new Date(latest.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
-            : "-";
+        const latestDate = latest.date ? formatShortUtcDate(latest.date) : "-";
 
         const pickMetric = (columnName: string, row: string[]) => {
             const metricIndex = wearTable.c.indexOf(columnName);
@@ -170,17 +170,10 @@ export default function HomePage() {
             metrics: [
                 {
                     title: "Steps",
-                    value: latestSteps ? `${latestSteps.toLocaleString()} today` : "No data",
-                    sub: avgSteps7d ? `7d avg ${Math.round(avgSteps7d).toLocaleString()}` : "",
+                    value: latestSteps ? `${formatNumber(latestSteps)} today` : "No data",
+                    sub: avgSteps7d ? `7d avg ${formatNumber(Math.round(avgSteps7d))}` : "",
                     progress: latestSteps ? clamp((latestSteps / 10000) * 100, 0, 100) : 0,
                     tone: stepsTone,
-                },
-                {
-                    title: "Sleep",
-                    value: latestSleep ? `${latestSleep.toFixed(1)}h` : "No data",
-                    sub: avgSleep7d ? `7d avg ${avgSleep7d.toFixed(1)}h` : "",
-                    progress: latestSleep ? clamp((latestSleep / 8.5) * 100, 0, 100) : 0,
-                    tone: sleepTone,
                 },
                 {
                     title: "Active Minutes",
@@ -188,6 +181,13 @@ export default function HomePage() {
                     sub: "Target 20+ min",
                     progress: latestActiveMinutes ? clamp((latestActiveMinutes / 30) * 100, 0, 100) : 0,
                     tone: activeTone,
+                },
+                {
+                    title: "Sleep",
+                    value: latestSleep ? `${latestSleep.toFixed(1)}h` : "No data",
+                    sub: avgSleep7d ? `7d avg ${avgSleep7d.toFixed(1)}h` : "",
+                    progress: latestSleep ? clamp((latestSleep / 8.5) * 100, 0, 100) : 0,
+                    tone: sleepTone,
                 },
                 {
                     title: "Sleep Quality",
@@ -224,7 +224,7 @@ export default function HomePage() {
             return;
         }
 
-        const PEEK_HEIGHT = 140;
+        const PEEK_HEIGHT = 50;
 
         const updateTravelDistance = () => {
             const nextTravel = Math.max(sheetElement.getBoundingClientRect().height - PEEK_HEIGHT, 0);
@@ -276,118 +276,76 @@ export default function HomePage() {
     };
 
     return (
-        <section className="h-full w-full px-4 pb-5 pt-4">
-            <div className="relative mx-auto h-full w-full max-w-sm overflow-hidden rounded-3xl border border-emerald-200/80 bg-gradient-to-b from-emerald-50 via-teal-50 to-white shadow-[0_16px_40px_rgba(15,118,110,0.14)]">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.35),transparent_72%)]" />
-
-                <div className="relative z-10 px-5 pt-5 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700/75">
-                        Your Companion
-                    </p>
-                    <h1 className="mt-2 text-2xl font-bold text-emerald-950">
-                        3D Health Avatar
-                    </h1>
-                    <p className="mt-2 text-sm text-emerald-900/70">
-                        Debug animation states with quick switches.
-                    </p>
-
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                        {animationOptions.map((option) => {
-                            const isActive = activeAnimationId === option.id;
-
-                            return (
-                                <Button
-                                    key={option.id}
-                                    size="sm"
-                                    variant={isActive ? "default" : "outline"}
-                                    className={isActive ? "bg-emerald-600 text-white hover:bg-emerald-700" : "border-emerald-300/80 text-emerald-900 hover:bg-emerald-100/80"}
-                                    onClick={() => setActiveAnimationId(option.id)}
-                                >
-                                    {option.label}
-                                </Button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                <div className="relative z-10 mt-2 h-[56vh] min-h-[370px] w-full p-3">
-                    <div className="h-full w-full rounded-2xl bg-gradient-to-b from-emerald-100/55 to-teal-200/30">
-                        <SimpleDAEViewer modelPath={activeAnimation.modelPath} />
-                    </div>
-                </div>
-
-                <div
-                    ref={sheetRef}
-                    className="absolute inset-x-0 bottom-0 z-20 h-[70%] rounded-t-3xl border-t border-emerald-200/80 bg-white/95 backdrop-blur-sm"
-                    style={{
-                        transform: `translateY(${sheetOffset}px)`,
-                        transition: isDraggingSheet ? "none" : "transform 250ms ease",
-                    }}
-                >
-                    <div
-                        className="cursor-grab touch-none px-5 pb-4 pt-3 active:cursor-grabbing"
-                        onPointerDown={handleSheetPointerDown}
-                        onPointerMove={handleSheetPointerMove}
-                        onPointerUp={handleSheetPointerUp}
-                        onPointerCancel={handleSheetPointerUp}
-                    >
-                        <div className="mx-auto h-1.5 w-12 rounded-full bg-emerald-300" />
-                        <div className="mt-3 flex items-center justify-between">
-                            <h2 className="text-base font-semibold text-emerald-950">Hi Thomas!</h2>
-                            <p className="text-xs font-medium text-emerald-700/80">Latest sync: 09:35</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3 px-5 pb-6">
-                        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 p-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Recovery gauge</p>
-                                    <p className="mt-1 text-sm text-emerald-900">Based on sleep, quality, resting HR, and HRV.</p>
-                                </div>
-                                <div className="relative grid h-20 w-20 place-items-center rounded-full p-1" style={healthInsights.gaugeStyle}>
-                                    <div className="grid h-full w-full place-items-center rounded-full bg-white">
-                                        <span className="text-lg font-bold text-emerald-950">{healthInsights.recoveryScore}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${toneStyles[healthInsights.recoveryTone].badge}`}>
-                                {toneStyles[healthInsights.recoveryTone].label}
-                            </div>
-                            <Button
-                                asChild
-                                variant="outline"
-                                className="mt-4 w-full border-emerald-300/80 bg-white/70 text-emerald-950 hover:bg-emerald-100/80"
-                            >
-                                <Link href="/daily_checkin">Go to daily check-in</Link>
-                            </Button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3">
-                            {healthInsights.metrics.map((metric) => (
-                                <div key={metric.title} className="rounded-2xl border border-slate-200/80 bg-white p-3">
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div>
-                                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{metric.title}</p>
-                                            <p className="mt-1 text-sm font-semibold text-slate-900">{metric.value}</p>
-                                            {metric.sub ? <p className="mt-0.5 text-xs text-slate-500">{metric.sub}</p> : null}
-                                        </div>
-                                        <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${toneStyles[metric.tone].badge}`}>
-                                            {toneStyles[metric.tone].label}
-                                        </span>
-                                    </div>
-                                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                                        <div
-                                            className={`h-full rounded-full transition-all ${toneStyles[metric.tone].bar}`}
-                                            style={{ width: `${metric.progress}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+        <div
+            ref={sheetRef}
+            className="absolute inset-x-0 bottom-0 z-20 h-[70%] rounded-t-3xl border-t border-emerald-200/80 bg-white/95 backdrop-blur-sm"
+            style={{
+                transform: `translateY(${sheetOffset}px)`,
+                transition: isDraggingSheet ? "none" : "transform 250ms ease",
+            }}
+        >
+            <div
+                className="cursor-grab touch-none px-5 pb-4 pt-3 active:cursor-grabbing"
+                onPointerDown={handleSheetPointerDown}
+                onPointerMove={handleSheetPointerMove}
+                onPointerUp={handleSheetPointerUp}
+                onPointerCancel={handleSheetPointerUp}
+            >
+                <div className="mx-auto h-1.5 w-12 rounded-full bg-emerald-300" />
+                <div className="mt-3 flex items-center justify-between">
+                    <h2 className="text-base font-semibold text-emerald-950">Hi Max!</h2>
+                    <p className="text-xs font-medium text-emerald-700/80">Latest sync: 09:35</p>
                 </div>
             </div>
-        </section>
+
+            <div className="space-y-3 px-5 pb-6">
+                <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 p-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Recovery gauge</p>
+                            <p className="mt-1 text-sm text-emerald-900">Based on sleep, quality, resting HR, and HRV.</p>
+                        </div>
+                        <div className="relative grid h-20 w-20 place-items-center rounded-full p-1" style={healthInsights.gaugeStyle}>
+                            <div className="grid h-full w-full place-items-center rounded-full bg-white">
+                                <span className="text-lg font-bold text-emerald-950">{healthInsights.recoveryScore}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${toneStyles[healthInsights.recoveryTone].badge}`}>
+                        {toneStyles[healthInsights.recoveryTone].label}
+                    </div>
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="mt-4 w-full border-emerald-300/80 bg-white/70 text-emerald-950 hover:bg-emerald-100/80"
+                    >
+                        <Link href="/daily_checkin">Go to daily check-in</Link>
+                    </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                    {healthInsights.metrics.map((metric) => (
+                        <div key={metric.title} className="rounded-2xl border border-slate-200/80 bg-white p-3">
+                            <div className="flex items-start justify-between gap-2">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{metric.title}</p>
+                                    <p className="mt-1 text-sm font-semibold text-slate-900">{metric.value}</p>
+                                    {metric.sub ? <p className="mt-0.5 text-xs text-slate-500">{metric.sub}</p> : null}
+                                </div>
+                                <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${toneStyles[metric.tone].badge}`}>
+                                    {toneStyles[metric.tone].label}
+                                </span>
+                            </div>
+                            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                                <div
+                                    className={`h-full rounded-full transition-all ${toneStyles[metric.tone].bar}`}
+                                    style={{ width: `${metric.progress}%` }}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
 }

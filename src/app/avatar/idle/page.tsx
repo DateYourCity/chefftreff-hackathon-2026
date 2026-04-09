@@ -54,7 +54,7 @@ export default function HomePage() {
 
         timeOutRef.current = setTimeout(() => {
             setIsBubblesShown(true);
-        }, 3800);
+        }, 0);
 
         return () => {
             if (timeOutRef.current) {
@@ -74,7 +74,7 @@ export default function HomePage() {
                             Biological Age
                         </p>
                         <p className="mt-2 text-3xl font-semibold text-slate-950">
-                            {isBubblesShown ? "46" : "Loading..."}
+                            {isBubblesShown ? "37" : "Loading..."}
                         </p>
                     </div>
                 </div>
@@ -90,7 +90,7 @@ export default function HomePage() {
                                     width: "260px",
                                     height: "420px",
                                 }}
-                                src="/avatar/wave_sad.mp4"
+                                src="/avatar/idle.mp4"
                                 muted
                                 loop
                                 playsInline
