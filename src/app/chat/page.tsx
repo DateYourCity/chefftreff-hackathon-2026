@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Paperclip, X } from "lucide-react";
+import { Database, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 type MessageRole = "assistant" | "user";
@@ -56,23 +56,12 @@ type ShopRecommendation = {
 const STORAGE_KEY = "daily-checkin-chat-context";
 
 const INITIAL_MESSAGES: Message[] = [
-    {
-        id: "m-1",
-        role: "assistant",
-        content:
-            "Hi Matthias, I reviewed your latest check-in and wearable trends. Want a quick summary or help drafting questions for your doctor visit?",
-    },
-    {
-        id: "m-2",
-        role: "user",
-        content: "Give me a quick summary in plain language.",
-    },
-    {
-        id: "m-3",
-        role: "assistant",
-        content:
-            "Here is the short version: your sleep improved this week, stress markers are still elevated in the afternoon, and hydration is lower than your target on 3 out of 7 days.",
-    },
+  {
+    id: "m-1",
+    role: "assistant",
+    content:
+      "Hello. I reviewed your recent check-in. I can explain the recommendations or help you plan next steps.",
+  },
 ];
 
 function getCoachReply(question: string, data: SubmittedCheckIn) {
@@ -85,19 +74,34 @@ function getCoachReply(question: string, data: SubmittedCheckIn) {
     return `Hydration is a focus because you logged ${water} glasses. This may affect energy and concentration later in the day.`;
   }
 
-  if (normalized.includes("eat") || normalized.includes("meal") || normalized.includes("nutrition")) {
-    return `A practical next step is a structured lunch with protein, fiber, and one fruit or vegetable. This would support steadier energy through the afternoon.`;
+  if (
+    normalized.includes("eat") ||
+    normalized.includes("meal") ||
+    normalized.includes("nutrition")
+  ) {
+    return "A practical next step is a structured lunch with protein, fiber, and one fruit or vegetable. This would support steadier energy through the afternoon.";
   }
 
-  if (normalized.includes("movement") || normalized.includes("exercise") || normalized.includes("activity")) {
-    return `Based on today’s activity, a short walk or light mobility session would be a sensible next step. The goal is consistency, not intensity.`;
+  if (
+    normalized.includes("movement") ||
+    normalized.includes("exercise") ||
+    normalized.includes("activity")
+  ) {
+    return "Based on today’s activity, a short walk or light mobility session would be a sensible next step. The goal is consistency, not intensity.";
   }
 
-  if (normalized.includes("stress") || normalized.includes("sleep") || normalized.includes("energy")) {
-    return `Stress, sleep, and energy appear closely linked in this check-in. Improving evening recovery is likely to have the strongest effect on tomorrow.`;
+  if (
+    normalized.includes("stress") ||
+    normalized.includes("sleep") ||
+    normalized.includes("energy")
+  ) {
+    return "Stress, sleep, and energy appear closely linked in this check-in. Improving evening recovery is likely to have the strongest effect on tomorrow.";
   }
 
-  if (normalized.includes("priority") || normalized.includes("most important")) {
+  if (
+    normalized.includes("priority") ||
+    normalized.includes("most important")
+  ) {
     if (stress >= 7) {
       return "The main priority is recovery this evening. A calmer routine is likely to help more than adding another task.";
     }
@@ -160,7 +164,10 @@ function MessageBubble({ message }: { message: Message }) {
 
   return (
     <div
-      className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}
+      className={cn(
+        "flex items-end gap-2",
+        isUser ? "justify-end" : "justify-start"
+      )}
     >
       {!isUser && <Avatar />}
 
@@ -278,7 +285,9 @@ export default function ChatPage() {
     const userMessage: Message = {
       id: `u-${Date.now()}`,
       role: "user",
-      content: trimmed ? `${trimmed}${attachmentSummary}` : `Uploaded${attachmentSummary}`,
+      content: trimmed
+        ? `${trimmed}${attachmentSummary}`
+        : `Uploaded${attachmentSummary}`,
     };
 
     const nextMessages = [...messages, userMessage];
@@ -383,8 +392,12 @@ export default function ChatPage() {
                   key={item.title}
                   className="rounded-2xl border border-slate-200 bg-slate-50/90 p-3"
                 >
-                  <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">{item.detail}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {item.detail}
+                  </p>
                 </div>
               ))}
             </div>
@@ -473,26 +486,29 @@ export default function ChatPage() {
         className="absolute inset-x-0 bottom-0 border-t border-slate-200/90 bg-white/92 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur"
       >
         <div className="mx-auto flex max-w-xl flex-col gap-2">
-          {attachedFiles.length > 0 && (
-            <div className="flex flex-wrap gap-2 px-1">
-              {attachedFiles.map(({ id, file }) => (
-                <div
-                  key={id}
-                  className="flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600"
-                >
-                  <span className="max-w-[11rem] truncate">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeAttachedFile(id)}
-                    className="inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
-                    aria-label={`Remove ${file.name}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+          <div className="flex flex-wrap gap-2 px-1">
+            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
+              <Database className="h-3.5 w-3.5 text-slate-500" />
+              <span>Health Data</span>
             </div>
-          )}
+
+            {attachedFiles.map(({ id, file }) => (
+              <div
+                key={id}
+                className="flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600"
+              >
+                <span className="max-w-[11rem] truncate">{file.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachedFile(id)}
+                  className="inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
+                  aria-label={`Remove ${file.name}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
 
           <div className="flex items-end gap-2 rounded-3xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
             <input

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { getHealthDocs } from "@/lib/health-docs";
 import {
     CalendarDays,
     ChevronRight,
@@ -7,11 +8,31 @@ import {
     Sparkles,
     Stethoscope,
 } from "lucide-react";
-import { getHealthDocs } from "@/lib/health-docs";
+import Link from "next/link";
+import { PastVisitsList } from "./past-visits-list";
 
 const visitHistory = [
     {
+        id: "visit-11",
+        status: "upcoming",
+        date: "22 Apr 2026",
+        doctor: "Dr. Anna Keller",
+        specialty: "General Practice",
+        location: "Munich City Center",
+        summary: "Annual check-up and blood pressure review.",
+    },
+    {
+        id: "visit-12",
+        status: "upcoming",
+        date: "06 May 2026",
+        doctor: "Dr. Mehmet Yilmaz",
+        specialty: "Cardiology",
+        location: "Schwabing",
+        summary: "Repeat ECG follow-up to confirm palpitations have settled.",
+    },
+    {
         id: "visit-01",
+        status: "past",
         date: "08 Apr 2026",
         doctor: "Dr. Anna Keller",
         specialty: "General Practice",
@@ -20,6 +41,7 @@ const visitHistory = [
     },
     {
         id: "visit-02",
+        status: "past",
         date: "14 Feb 2026",
         doctor: "Dr. Mehmet Yilmaz",
         specialty: "Cardiology",
@@ -28,6 +50,7 @@ const visitHistory = [
     },
     {
         id: "visit-03",
+        status: "past",
         date: "03 Dec 2025",
         doctor: "Dr. Sophie Brandt",
         specialty: "Dermatology",
@@ -36,6 +59,7 @@ const visitHistory = [
     },
     {
         id: "visit-04",
+        status: "past",
         date: "21 Oct 2025",
         doctor: "Dr. Lukas Werner",
         specialty: "Orthopedics",
@@ -44,6 +68,7 @@ const visitHistory = [
     },
     {
         id: "visit-05",
+        status: "past",
         date: "12 Aug 2025",
         doctor: "Dr. Clara Neumann",
         specialty: "Gynecology",
@@ -52,6 +77,7 @@ const visitHistory = [
     },
     {
         id: "visit-06",
+        status: "past",
         date: "25 Jun 2025",
         doctor: "Dr. Jonas Beck",
         specialty: "ENT",
@@ -60,6 +86,7 @@ const visitHistory = [
     },
     {
         id: "visit-07",
+        status: "past",
         date: "09 Apr 2025",
         doctor: "Dr. Eva Schmitt",
         specialty: "Neurology",
@@ -68,6 +95,7 @@ const visitHistory = [
     },
     {
         id: "visit-08",
+        status: "past",
         date: "17 Jan 2025",
         doctor: "Dr. David Roth",
         specialty: "Gastroenterology",
@@ -76,6 +104,7 @@ const visitHistory = [
     },
     {
         id: "visit-09",
+        status: "past",
         date: "04 Nov 2024",
         doctor: "Dr. Miriam Vogel",
         specialty: "Ophthalmology",
@@ -84,6 +113,7 @@ const visitHistory = [
     },
     {
         id: "visit-10",
+        status: "past",
         date: "28 Aug 2024",
         doctor: "Dr. Felix Braun",
         specialty: "Endocrinology",
@@ -108,6 +138,8 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
     const docs = await getHealthDocs();
     const searchParams = await props.searchParams;
     const activeTab = searchParams.tab === "visits" ? "visits" : "documents";
+    const upcomingVisits = visitHistory.filter((visit) => visit.status === "upcoming");
+    const pastVisits = visitHistory.filter((visit) => visit.status === "past");
 
     return (
         <section className="min-h-full bg-[linear-gradient(180deg,#f8f5eb_0%,#f4f6fb_52%,#eef3f8_100%)] px-4 py-5">
@@ -126,17 +158,6 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
             <div className="mt-4 rounded-[26px] border border-white/70 bg-white/85 p-1.5 shadow-[0_14px_32px_rgba(15,23,42,0.07)]">
                 <div className="grid grid-cols-2 gap-1">
                     <Link
-                        href="/medical_details"
-                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
-                            activeTab === "documents"
-                                ? "bg-primary text-white"
-                                : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
-                        }`}
-                    >
-                        <FileText className="h-4 w-4 shrink-0" />
-                        Documents
-                    </Link>
-                    <Link
                         href="/medical_details?tab=visits"
                         className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
                             activeTab === "visits"
@@ -153,8 +174,18 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     : "bg-primary text-white"
                             }`}
                         >
-                            {futureAppointmentProposals.length}
+                            {upcomingVisits.length}
                         </span>
+                    </Link>
+                    <Link
+                        href="/medical_details"
+                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${activeTab === "documents"
+                                ? "bg-primary text-white"
+                                : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+                            }`}
+                    >
+                        <FileText className="h-4 w-4 shrink-0" />
+                        Documents
                     </Link>
                 </div>
             </div>
@@ -184,14 +215,14 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                 </div>
             ) : (
                 <div className="mt-4 space-y-3">
-                    <div className="rounded-[26px] border border-primary/15 bg-[linear-gradient(135deg,rgba(70,120,96,0.10),rgba(255,255,255,0.94))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
-                        <div className="flex items-center gap-2 text-primary">
+                        <div className="rounded-[26px] border border-rose-200/80 bg-[linear-gradient(135deg,rgba(255,228,228,0.95),rgba(255,255,255,0.97))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                            <div className="flex items-center gap-2 text-rose-700">
                             <Sparkles className="h-4 w-4" />
                             <p className="text-xs font-semibold uppercase tracking-[0.2em]">
                                 Proposed Next Appointments
                             </p>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                            <p className="mt-2 text-sm leading-6 text-rose-900/70">
                             Based on your recent visits, these follow-ups would make sense to schedule next.
                         </p>
 
@@ -199,14 +230,14 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                             {futureAppointmentProposals.map((proposal) => (
                                 <article
                                     key={proposal.id}
-                                    className="rounded-[22px] border border-primary/15 bg-[linear-gradient(180deg,rgba(229,242,235,0.96),rgba(243,249,245,0.98))] px-4 py-4"
+                                    className="rounded-[22px] border border-rose-200 bg-[linear-gradient(180deg,rgba(255,244,244,0.98),rgba(255,255,255,0.99))] px-4 py-4"
                                 >
                                     <div className="flex items-start gap-3">
-                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
                                             <CalendarDays className="h-5 w-5" />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium text-primary">
+                                            <p className="text-sm font-medium text-rose-700">
                                                 {proposal.timeframe}
                                             </p>
                                             <h2 className="mt-1 text-base font-semibold text-foreground">
@@ -218,6 +249,13 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                             <p className="mt-2 text-sm leading-6 text-muted-foreground">
                                                 {proposal.reason}
                                             </p>
+                                            <Button
+                                                asChild
+                                                size="sm"
+                                                className="mt-4 h-9 w-full rounded-full bg-rose-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-rose-700"
+                                            >
+                                                <Link href="/appointment">Book appointment</Link>
+                                            </Button>
                                         </div>
                                     </div>
                                 </article>
@@ -225,37 +263,73 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                         </div>
                     </div>
 
-                    {visitHistory.map((visit) => (
-                        <article
-                            key={visit.id}
-                            className="rounded-[24px] border border-border/70 bg-white px-4 py-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]"
-                        >
-                            <div className="flex items-start gap-3">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
-                                    <Stethoscope className="h-5 w-5" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <CalendarDays className="h-4 w-4" />
-                                        <span>{visit.date}</span>
-                                    </div>
-                                    <h2 className="mt-2 text-base font-semibold text-foreground">
-                                        {visit.doctor}
-                                    </h2>
-                                    <p className="text-sm font-medium text-primary">
-                                        {visit.specialty}
+                        <section className="rounded-[26px] border border-emerald-200/80 bg-[linear-gradient(180deg,rgba(236,248,241,0.96),rgba(255,255,255,0.98))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.05)]">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                                        Upcoming visits
                                     </p>
-                                    <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                                        <MapPin className="h-4 w-4" />
-                                        <span>{visit.location}</span>
-                                    </div>
-                                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                                        {visit.summary}
-                                    </p>
+                                    <h3 className="mt-1 text-lg font-semibold text-foreground">
+                                        Next appointments
+                                    </h3>
                                 </div>
+                                <span className="inline-flex rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">
+                                    {upcomingVisits.length}
+                                </span>
                             </div>
-                        </article>
-                    ))}
+
+                            <div className="mt-4 space-y-3">
+                                {upcomingVisits.map((visit) => (
+                                    <article
+                                        key={visit.id}
+                                        className="rounded-[22px] border border-emerald-200 bg-white px-4 py-4"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                                                <CalendarDays className="h-5 w-5" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2 text-sm text-emerald-700">
+                                                    <CalendarDays className="h-4 w-4" />
+                                                    <span>{visit.date}</span>
+                                                </div>
+                                                <h2 className="mt-2 text-base font-semibold text-foreground">
+                                                    {visit.doctor}
+                                                </h2>
+                                                <p className="text-sm font-medium text-primary">
+                                                    {visit.specialty}
+                                                </p>
+                                                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <MapPin className="h-4 w-4" />
+                                                    <span>{visit.location}</span>
+                                                </div>
+                                                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                                                    {visit.summary}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="rounded-[26px] border border-border/70 bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                                        Past visits
+                                    </p>
+                                    <h3 className="mt-1 text-lg font-semibold text-foreground">
+                                        Previous appointments
+                                    </h3>
+                                </div>
+                                <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+                                    {pastVisits.length}
+                                </span>
+                            </div>
+
+                            <PastVisitsList visits={pastVisits} />
+                        </section>
                 </div>
             )}
         </section>
