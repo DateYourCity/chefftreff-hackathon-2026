@@ -137,9 +137,11 @@ function getMedicalDocumentReply(
   if (
     normalized.includes("flag") ||
     normalized.includes("abnormal") ||
-    normalized.includes("result")
+    normalized.includes("result") ||
+    normalized.includes("glucose") ||
+    normalized.includes("sugar")
   ) {
-    return `For ${documentLabel}, start with any flagged or borderline items and then compare related values together. That gives a clearer picture than looking at isolated numbers.`;
+    return `The main point is not that 98 mg/dL is high on its own. It is that your fasting glucose appears to have moved up from a usual baseline of 85 mg/dL, which can be an early signal worth following.`;
   }
 
   if (
@@ -477,6 +479,32 @@ export default function ChatPage() {
                     {context.document.summary}
                   </p>
                 </div>
+
+                {context.document.keyStats && context.document.keyStats.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {context.document.keyStats.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl bg-white px-3 py-2 ring-1 ring-slate-200"
+                      >
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          {item.label}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {item.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {context.document.riskCallout && (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+                    <p className="text-sm font-medium text-amber-900">
+                      {context.document.riskCallout}
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex flex-wrap gap-2">
                   {context.document.focusAreas.map((item) => (
