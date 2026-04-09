@@ -90,7 +90,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 BetterYou
               </p>
               <p className="text-xs text-muted-foreground">
-                Personal Health Companion
+                Connect the dots.
               </p>
             </div>
           </Link>
@@ -141,7 +141,7 @@ export const BottomNav = React.forwardRef<HTMLElement, BottomNavProps>(
       <nav
         ref={ref}
         className={cn(
-          "sticky bottom-0 z-40 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3",
+          "z-40 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3",
           className
         )}
         {...props}

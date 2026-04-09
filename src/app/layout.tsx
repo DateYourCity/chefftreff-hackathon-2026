@@ -47,7 +47,7 @@ export default function RootLayout({
                             <div className="device-notch" aria-hidden="true" />
                             <div className="device-screen">
                                 <Navbar />
-                                <div className="flex-1 pb-[calc(env(safe-area-inset-bottom)+5.75rem)]">
+                                <div className="flex-1 min-h-0 overflow-y-auto">
                                     {children}
                                 </div>
                                 <BottomNav />
