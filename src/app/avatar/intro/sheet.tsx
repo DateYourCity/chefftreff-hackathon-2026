@@ -3,6 +3,7 @@
 import userData from "@/app/chat/user_data.json";
 import SimpleDAEViewer from "@/components/three-avatar";
 import { Button } from "@/components/ui/button";
+import { formatShortUtcDate } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -70,6 +71,12 @@ const toneStyles: Record<InsightTone, { badge: string; bar: string; label: strin
     },
 };
 
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+function formatNumber(value: number): string {
+    return numberFormatter.format(value);
+}
+
 const animationOptions = [
     { id: "neutral-idle", label: "Neutral Idle", modelPath: "/models/Neutral Idle.dae" },
     { id: "sad-walk", label: "Sad Walk", modelPath: "/models/Sad Walk.dae" },
@@ -93,9 +100,7 @@ export default function Sheet() {
         const latestIndex = Math.max(wearRows.length - 1, 0);
         const latest = tableRowToRecord(wearTable, latestIndex);
         const recentRows = wearRows.slice(-7);
-        const latestDate = latest.date
-            ? new Date(latest.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
-            : "-";
+        const latestDate = latest.date ? formatShortUtcDate(latest.date) : "-";
 
         const pickMetric = (columnName: string, row: string[]) => {
             const metricIndex = wearTable.c.indexOf(columnName);
@@ -165,8 +170,8 @@ export default function Sheet() {
             metrics: [
                 {
                     title: "Steps",
-                    value: latestSteps ? `${latestSteps.toLocaleString()} today` : "No data",
-                    sub: avgSteps7d ? `7d avg ${Math.round(avgSteps7d).toLocaleString()}` : "",
+                    value: latestSteps ? `${formatNumber(latestSteps)} today` : "No data",
+                    sub: avgSteps7d ? `7d avg ${formatNumber(Math.round(avgSteps7d))}` : "",
                     progress: latestSteps ? clamp((latestSteps / 10000) * 100, 0, 100) : 0,
                     tone: stepsTone,
                 },

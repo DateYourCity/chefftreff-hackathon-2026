@@ -54,7 +54,7 @@ export default async function HealthDocViewerPage(
                     />
                     <Link
                         href={`/medical_details/${encodeURIComponent(doc.id)}/qr`}
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-[transform,background-color,border-color,box-shadow] duration-200 hover:bg-muted active:scale-[0.98]"
                     >
                         Show QR
                         <QrCode className="h-4 w-4" />

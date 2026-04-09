@@ -1,8 +1,8 @@
 "use client";
 
 import userData from "@/app/chat/user_data.json";
-import SimpleDAEViewer from "@/components/three-avatar";
 import { Button } from "@/components/ui/button";
+import { formatShortUtcDate } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -93,9 +93,7 @@ export default function Sheet() {
         const latestIndex = Math.max(wearRows.length - 1, 0);
         const latest = tableRowToRecord(wearTable, latestIndex);
         const recentRows = wearRows.slice(-7);
-        const latestDate = latest.date
-            ? new Date(latest.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
-            : "-";
+        const latestDate = latest.date ? formatShortUtcDate(latest.date) : "-";
 
         const pickMetric = (columnName: string, row: string[]) => {
             const metricIndex = wearTable.c.indexOf(columnName);
