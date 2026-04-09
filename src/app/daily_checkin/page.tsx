@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Brain, Sparkles, Waves } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -493,6 +494,40 @@ export default function DailyCheckInPage() {
                   </CardContent>
                 </CheckInSurfaceCard>
               )}
+
+              <CheckInSurfaceCard>
+                <CardHeader className="gap-4 px-6 pt-6 pb-5">
+                  <div>
+                    <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
+                      Clinic follow-up
+                    </CardTitle>
+                    <CardDescription className="mt-1 max-w-[31ch]">
+                      Recommended next step for higher stress days.
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 px-6 pb-6">
+                  <div className="rounded-3xl border border-[var(--checkin-border)] bg-white/80 p-4">
+                    <p className="text-sm font-semibold text-foreground">
+                      Stress-Management visit at our local clinic
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      A short clinic visit can help review your current stress load,
+                      recovery habits, and practical support options.
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-[var(--checkin-warm-text)]">
+                      Best fit when stress is recurring or feels harder to manage.
+                    </p>
+                  </div>
+
+                  <Button
+                    asChild
+                    className={cn("h-14 w-full rounded-2xl text-base", checkInTheme.brandButton)}
+                  >
+                    <Link href="/medical_details?tab=visits">Book here</Link>
+                  </Button>
+                </CardContent>
+              </CheckInSurfaceCard>
 
               <div className="rounded-[2rem] border border-[var(--checkin-border)] bg-[var(--checkin-card)] p-5 shadow-lg shadow-[var(--checkin-shadow)] backdrop-blur-sm">
                 <div className="space-y-2">
