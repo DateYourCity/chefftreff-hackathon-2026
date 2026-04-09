@@ -38,6 +38,10 @@ const INITIAL_MESSAGES: Message[] = [
     },
 ];
 
+type ChatApiResponse = {
+    content?: string;
+};
+
 function Avatar() {
     return (
         <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white shadow-sm">
@@ -111,10 +115,7 @@ export default function ChatPage() {
 
     const handleFilesSelected = (event: ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files ?? []);
-
-        if (files.length === 0) {
-            return;
-        }
+        if (files.length === 0) return;
 
         setAttachedFiles((current) => [
             ...current,
@@ -131,13 +132,11 @@ export default function ChatPage() {
         setAttachedFiles((current) => current.filter((item) => item.id !== id));
     };
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         const trimmed = text.trim();
         const fileCount = attachedFiles.length;
 
-        if ((!trimmed && fileCount === 0) || isTyping) {
-            return;
-        }
+        if ((!trimmed && fileCount === 0) || isTyping) return;
 
         const attachmentSummary =
             fileCount > 0
@@ -152,23 +151,54 @@ export default function ChatPage() {
             content: trimmed ? `${trimmed}${attachmentSummary}` : `Uploaded${attachmentSummary}`,
         };
 
-        setMessages((current) => [...current, userMessage]);
+        const nextMessages = [...messages, userMessage];
+        setMessages(nextMessages);
         setText("");
         setAttachedFiles([]);
         setIsTyping(true);
 
-        window.setTimeout(() => {
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    messages: nextMessages.map((m) => ({
+                        role: m.role,
+                        content: m.content,
+                    })),
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Chat request failed (${response.status}): ${errorText}`);
+            }
+
+            const data = (await response.json()) as ChatApiResponse;
+
             const assistantMessage: Message = {
                 id: `a-${Date.now()}`,
                 role: "assistant",
-                content: fileCount
-                    ? "I can see the files you attached. For this demo, I can summarize them, extract key points, or help turn them into a doctor-ready note."
-                    : "I can help with that. For this demo, I can summarize trends, suggest next actions, and draft a doctor-ready note from your data.",
+                content: data.content ?? "No response received.",
             };
 
             setMessages((current) => [...current, assistantMessage]);
+        } catch (error) {
+            console.error(error);
+
+            setMessages((current) => [
+                ...current,
+                {
+                    id: `a-${Date.now()}`,
+                    role: "assistant",
+                    content: "There was an error contacting the chat service.",
+                },
+            ]);
+        } finally {
             setIsTyping(false);
-        }, 900);
+        }
     };
 
     return (
@@ -185,16 +215,12 @@ export default function ChatPage() {
                 </div>
             </header>
 
-            <main
-                className="flex-1 space-y-4 overflow-y-auto px-4 py-4 pb-34"
-                aria-live="polite"
-            >
+            <main className="flex-1 space-y-4 overflow-y-auto px-4 py-4 pb-34" aria-live="polite">
                 {messages.map((message) => (
                     <MessageBubble key={message.id} message={message} />
                 ))}
 
                 {isTyping && <TypingIndicator />}
-
                 <div ref={bottomRef} />
             </main>
 
@@ -235,6 +261,7 @@ export default function ChatPage() {
                             className="hidden"
                             onChange={handleFilesSelected}
                         />
+
                         <Button
                             type="button"
                             variant="outline"
@@ -245,6 +272,7 @@ export default function ChatPage() {
                         >
                             <Paperclip className="h-4 w-4" />
                         </Button>
+
                         <textarea
                             ref={textareaRef}
                             value={text}
@@ -259,6 +287,7 @@ export default function ChatPage() {
                             placeholder="Message Health Copilot"
                             className="max-h-36 min-h-10 flex-1 resize-none bg-transparent px-3 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400"
                         />
+
                         <Button
                             type="submit"
                             disabled={(!text.trim() && attachedFiles.length === 0) || isTyping}
