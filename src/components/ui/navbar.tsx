@@ -11,9 +11,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { LogIn, LogOut } from "lucide-react"
 
 // Simple logo component for the navbar
 const Logo = (props: React.SVGAttributes<SVGElement>) => {
@@ -29,7 +26,7 @@ const Logo = (props: React.SVGAttributes<SVGElement>) => {
             {...(props as any)}
         >
             <rect fill="currentColor" height="323" rx="161.5" width="323" x="0.5" />
-            <circle cx="162" cy="161.5" fill="white" r="60" className="dark:fill-black" />
+            <circle cx="162" cy="161.5" fill="white" r="60" />
         </svg>
     )
 }

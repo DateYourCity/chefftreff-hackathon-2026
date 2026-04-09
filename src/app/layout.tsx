@@ -31,8 +31,9 @@ export default function RootLayout({
             <body className={manrope.variable} suppressHydrationWarning>
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="system"
-                    enableSystem
+                    defaultTheme="light"
+                    enableSystem={false}
+                    forcedTheme="light"
                     disableTransitionOnChange
                 >
                     <div className="app-shell">
