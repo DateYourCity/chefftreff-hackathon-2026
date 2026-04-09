@@ -176,18 +176,19 @@ export default function DailyCheckInPage() {
                   {completion}% logged
                 </h2>
               </div>
+              { /* 
               <div className="rounded-2xl bg-[var(--checkin-white-muted)] px-4 py-3 text-right backdrop-blur-sm">
                 <p className="text-[11px] tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
                   Outcome
                 </p>
-                <p className="mt-1 text-sm font-medium">Ready to save</p>
-              </div>
+                <p className="mt-1 text-sm font-medium">Ready to save</p> 
+              </div>*/}
             </div>
 
             <div className="mt-5 space-y-2.5">
               <div className="flex items-center justify-between text-xs text-[var(--checkin-white-text-soft)]">
                 <span>7 lifestyle prompts</span>
-                <span>Quick to complete</span>
+                {/*<span>Quick to complete</span>*/}
               </div>
               <Progress value={completion} className="h-2.5 bg-white/14" />
             </div>
@@ -262,7 +263,6 @@ export default function DailyCheckInPage() {
             icon={Dumbbell}
             label="Movement"
             title="How active have you been this week?"
-            description="One-tap choices make exercise frequency fast to log on mobile."
           >
             <div className="space-y-3">
               <Label className="text-sm font-semibold text-foreground">
@@ -275,18 +275,17 @@ export default function DailyCheckInPage() {
               />
             </div>
 
-            <div className="rounded-3xl border border-[var(--checkin-border)] bg-[var(--checkin-brand-mint)] p-5">
+            <div className="rounded-md border border-[var(--checkin-border)] bg-[var(--checkin-brand-mint)] p-5">
               <div className="flex items-center gap-3.5">
                 <div className="flex size-10 items-center justify-center rounded-2xl bg-white text-[var(--checkin-brand)] shadow-sm">
                   <Sparkles className="size-4" />
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-foreground">
-                    Design note
+                    Tip
                   </p>
                   <p className="text-sm leading-5 text-muted-foreground">
-                    The chip pattern is reusable for other ordinal lifestyle
-                    fields like smoking, alcohol, or meal frequency.
+                   Connect your fitness tracker for better data.
                   </p>
                 </div>
               </div>

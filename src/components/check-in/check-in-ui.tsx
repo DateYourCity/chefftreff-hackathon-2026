@@ -56,7 +56,7 @@ export function CheckInSectionCard({
   icon: ComponentType<{ className?: string }>;
   label: string;
   title: string;
-  description: string;
+  description?: string;
   children: ReactNode;
 }) {
   return (

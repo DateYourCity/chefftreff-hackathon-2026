@@ -21,7 +21,7 @@ const INFO_ITEMS = [
 export default function Home() {
     return (
         <main className="flex min-h-full items-center justify-center bg-gradient-to-br from-background via-background to-muted px-6 py-12">
-            <section className="w-full max-w-2xl space-y-8 rounded-3xl border bg-card p-8 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+            <section className="w-full max-w-2xl space-y-8 rounded-3xl border bg-card p-4 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
                 <div className="space-y-4 text-center">
                     <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                         Health companion for the hackathon
@@ -37,7 +37,7 @@ export default function Home() {
                     {INFO_ITEMS.map((item) => (
                         <div
                             key={item.title}
-                            className="rounded-2xl border bg-background/70 p-4"
+                            className="rounded-2xl border bg-background/70 p-2"
                         >
                             <h2 className="text-lg font-semibold">{item.title}</h2>
                             <p className="mt-1 text-sm leading-6 text-muted-foreground">
