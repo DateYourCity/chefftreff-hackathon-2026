@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    --app-frame-width: 402px;
+    --app-frame-width: 422px;
     --app-frame-height: 874px;
     --app-bezel: 12px;
     --app-radius-outer: 48px;
