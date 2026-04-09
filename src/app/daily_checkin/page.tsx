@@ -147,16 +147,16 @@ export default function DailyCheckInPage() {
           </div>
 
           <div className="mt-7 space-y-4">
-            <p className="text-sm font-medium text-[var(--checkin-warm-text)]">
+            {/*<p className="text-sm font-medium text-[var(--checkin-warm-text)]">
               Lifestyle survey data
-            </p>
+            </p>*/}
             <h1 className="max-w-[11ch] text-[2.7rem] leading-[0.92] font-semibold tracking-[-0.09em] text-foreground">
-              Log today&apos;s health habits in one calm flow.
+              Log today&apos;s health habits.
             </h1>
-            <p className="max-w-[31ch] text-sm leading-6 text-muted-foreground">
+            {/*<p className="max-w-[31ch] text-sm leading-6 text-muted-foreground">
               Capture self-reported diet quality, exercise frequency, stress
               level, sleep, and hydration with a guided mobile-friendly survey.
-            </p>
+            </p>*/}
           </div>
         </div>
 
