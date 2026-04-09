@@ -24,7 +24,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <div className="app-shell">
+          <div className="device-frame">
+            <div className="device-notch" aria-hidden="true" />
+            <div className="device-screen">
+              {children}
+            </div>
+          </div>
+        </div>
+      </body>
     </html>
   );
 }
