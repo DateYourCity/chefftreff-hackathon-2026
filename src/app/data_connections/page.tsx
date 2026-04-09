@@ -1,10 +1,19 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
     Apple,
+    ArrowRight,
     Building2,
+    Check,
+    Loader2,
     Microscope,
     ScanLine,
     ShieldCheck,
+    Sparkles,
 } from "lucide-react";
 
 const DATA_SOURCES = [
@@ -38,7 +47,77 @@ const DATA_SOURCES = [
     },
 ] as const;
 
+type SourceId = (typeof DATA_SOURCES)[number]["id"];
+type SourceStatus = "idle" | "loading" | "connected";
+type SourceState = Record<SourceId, SourceStatus>;
+
+const INITIAL_SOURCE_STATE = DATA_SOURCES.reduce((state, source) => {
+    state[source.id] = "idle";
+    return state;
+}, {} as SourceState);
+
 export default function DataConnectionsPage() {
+    const [sourceStates, setSourceStates] = useState<SourceState>(INITIAL_SOURCE_STATE);
+    const completionTimerRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (completionTimerRef.current !== null) {
+                window.clearTimeout(completionTimerRef.current);
+            }
+        };
+    }, []);
+
+    const connectedCount = DATA_SOURCES.filter((source) => sourceStates[source.id] === "connected").length;
+    const isAnyLoading = DATA_SOURCES.some((source) => sourceStates[source.id] === "loading");
+    const allConnected = connectedCount === DATA_SOURCES.length;
+
+    const startConnection = (sourceIds: SourceId[]) => {
+        if (completionTimerRef.current !== null) {
+            window.clearTimeout(completionTimerRef.current);
+        }
+
+        setSourceStates((currentState) => {
+            const nextState = { ...currentState };
+
+            sourceIds.forEach((sourceId) => {
+                nextState[sourceId] = "loading";
+            });
+
+            return nextState;
+        });
+
+        completionTimerRef.current = window.setTimeout(() => {
+            setSourceStates((currentState) => {
+                const nextState = { ...currentState };
+
+                sourceIds.forEach((sourceId) => {
+                    nextState[sourceId] = "connected";
+                });
+
+                return nextState;
+            });
+
+            completionTimerRef.current = null;
+        }, 900);
+    };
+
+    const handleConnectSource = (sourceId: SourceId) => {
+        if (sourceStates[sourceId] !== "idle" || isAnyLoading) {
+            return;
+        }
+
+        startConnection([sourceId]);
+    };
+
+    const handleConnectAll = () => {
+        if (isAnyLoading || allConnected) {
+            return;
+        }
+
+        startConnection(DATA_SOURCES.map((source) => source.id));
+    };
+
     return (
         <section className="min-h-full bg-[linear-gradient(180deg,#eff6ff_0%,#f7f8fc_45%,#f4fbf7_100%)] px-4 py-5">
             <div className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-[0_20px_45px_rgba(15,23,42,0.08)] backdrop-blur">
@@ -59,14 +138,43 @@ export default function DataConnectionsPage() {
                     </div>
                 </div>
 
-                <Button className="mt-4 h-10 w-full rounded-full text-sm font-semibold">
-                    Connect all
+                <Button
+                    className="mt-4 h-10 w-full rounded-full text-sm font-semibold"
+                    disabled={isAnyLoading || allConnected}
+                    onClick={handleConnectAll}
+                >
+                    {allConnected ? (
+                        <>
+                            <Check className="h-4 w-4" />
+                            All connected
+                        </>
+                    ) : isAnyLoading ? (
+                        <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Connecting all...
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles className="h-4 w-4" />
+                            Connect all
+                        </>
+                    )}
                 </Button>
+
+                {allConnected ? (
+                    <Button asChild className="mt-4 h-10 w-full rounded-full text-sm font-semibold">
+                        <Link href="/home">
+                            Show me my avatar
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                ) : null}
             </div>
 
             <div className="mt-4 space-y-3">
                 {DATA_SOURCES.map((source) => {
                     const Icon = source.icon;
+                    const status = sourceStates[source.id];
 
                     return (
                         <article
@@ -83,17 +191,35 @@ export default function DataConnectionsPage() {
                                 <p className="truncate text-base font-semibold text-foreground">
                                     {source.label}
                                 </p>
-                                <p className="truncate text-sm text-muted-foreground">
+                                <p className="line-clamp-2 max-w-[16rem] text-sm leading-5 text-muted-foreground">
                                     {source.subtitle}
                                 </p>
                             </div>
 
                             <Button
                                 size="sm"
-                                variant="outline"
-                                className="h-9 shrink-0 rounded-full px-4 text-sm font-semibold"
+                                variant={status === "connected" ? "default" : "outline"}
+                                className={
+                                    status === "connected"
+                                        ? "h-9 shrink-0 rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700"
+                                        : "h-9 shrink-0 rounded-full px-4 text-sm font-semibold"
+                                }
+                                disabled={status !== "idle" || isAnyLoading}
+                                onClick={() => handleConnectSource(source.id)}
                             >
-                                Connect
+                                {status === "loading" ? (
+                                    <>
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        Loading
+                                    </>
+                                ) : status === "connected" ? (
+                                    <>
+                                        <Check className="h-3.5 w-3.5" />
+                                        Connected
+                                    </>
+                                ) : (
+                                    "Connect"
+                                )}
                             </Button>
                         </article>
                     );
