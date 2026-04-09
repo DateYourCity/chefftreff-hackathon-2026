@@ -132,7 +132,7 @@ export function WaterGlassRating({
             <button
               key={glassValue}
               type="button"
-              onClick={() => onChange(glassValue)}
+              onClick={() => onChange(glassValue === value ? 0 : glassValue)}
               className={cn(
                 "group flex flex-col items-center gap-2 rounded-3xl border px-3 py-3 transition-all",
                 selected
@@ -182,7 +182,7 @@ export function ServingRating({
             <button
               key={servingValue}
               type="button"
-              onClick={() => onChange(servingValue)}
+              onClick={() => onChange(servingValue === value ? 0 : servingValue)}
               className={cn(
                 "group flex flex-col items-center gap-2 rounded-3xl border px-3 py-3 transition-all",
                 selected
