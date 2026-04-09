@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, ExternalLink, FileText } from "lucide-react";
+import { ChevronLeft, ExternalLink, FileText, QrCode } from "lucide-react";
 import { ExplainByCoachButton } from "@/components/medical-details/explain-by-coach-button";
 import { getHealthDocs } from "@/lib/health-docs";
 
@@ -47,11 +47,18 @@ export default async function HealthDocViewerPage(
             </div>
 
             <div className="flex flex-1 flex-col gap-3 p-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                     <ExplainByCoachButton
                         documentId={doc.id}
                         documentLabel={doc.label}
                     />
+                    <Link
+                        href={`/medical_details/${encodeURIComponent(doc.id)}/qr`}
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+                    >
+                        Show QR
+                        <QrCode className="h-4 w-4" />
+                    </Link>
                     <Link
                         href={pdfUrl}
                         target="_blank"

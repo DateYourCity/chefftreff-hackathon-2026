@@ -40,6 +40,13 @@ export type MedicalDocumentSummary = {
   id: string;
   label: string;
   summary: string;
+  riskCallout?: string;
+  riskTone?: "neutral" | "negative";
+  keyStats?: Array<{
+    label: string;
+    value: string;
+    tone?: "neutral" | "negative";
+  }>;
   focusAreas: string[];
   recommendedQuestions: string[];
   recommendations: Recommendation[];
@@ -92,62 +99,57 @@ export function buildMedicalDocumentChatContext(input: {
   if (normalized.includes("blood")) {
     const recommendations: Recommendation[] = [
       {
-        title: "Review flagged markers first",
-        detail: "Start with any values outside the reference range or marked borderline.",
-        reason: "This is usually the fastest way to identify what needs follow-up.",
+        title: "Trend matters here",
+        detail: "98 mg/dL is still in range, but it is a meaningful rise from your usual 85 mg/dL.",
+        reason: "A baseline shift can show early drift before a lab becomes clearly abnormal.",
       },
       {
-        title: "Group results by category",
-        detail: "Review blood count, metabolic markers, and nutrient-related markers separately.",
-        reason: "Category-based review makes the report easier to understand.",
+        title: "Watch glucose direction",
+        detail: "This result does not confirm disease, but it suggests movement toward a higher-risk pattern.",
+        reason: "Early changes are easier to address than late-stage abnormalities.",
       },
       {
-        title: "Confirm next test timing",
-        detail: "Ask when repeat labs are needed and which markers matter most.",
-        reason: "Trend data is often more useful than a single result.",
+        title: "Plan follow-up data",
+        detail: "A repeat fasting glucose or HbA1c can help confirm whether this was a one-off value or a real trend.",
+        reason: "Current risk is best judged from change over time, not one isolated result.",
       },
     ];
 
-    const shopRecommendations: ShopRecommendation[] = [
-      {
-        title: "Vitamin D3 support",
-        detail: "If low vitamin D is confirmed, ask whether a daily supplement is appropriate.",
-        href: "https://www.thorne.com/products/dp/vitamin-d-liquid",
-        linkLabel: "View Thorne Vitamin D",
-      },
-      {
-        title: "Iron bisglycinate",
-        detail: "Only consider iron after reviewing ferritin or iron studies with a clinician.",
-        href: "https://solaray.com/products/iron-glycinate",
-        linkLabel: "View Iron Option",
-      },
-    ];
+    const shopRecommendations: ShopRecommendation[] = [];
 
     return {
       kind: "medical-document",
-      summaryTitle: "Blood report overview",
-      summaryTheme: "Lab interpretation support",
+      summaryTitle: "Glucose trend alert",
+      summaryTheme: "Early metabolic drift",
       intro:
-        "I reviewed the blood report view. I can help explain common lab sections, highlight what to review first, and help you prepare follow-up questions for your care team.",
+        "I reviewed your blood report. Fasting blood sugar is 98 mg/dL. That still looks normal on paper, but it is a clear rise from your baseline of 85 mg/dL and may signal early drift toward a higher-risk zone.",
       document: {
         id: input.id,
         label: input.label,
         summary:
-          "This appears to be a blood report. The most useful first pass is to review flagged values, then look for patterns across blood count, metabolic, and nutrient markers.",
+          "This value is still sub-clinical, but the change from 85 to 98 mg/dL matters. The coach reads that shift as an early warning, not a harmless normal result.",
+        riskCallout:
+          "Normal range does not always mean normal for you. The key issue is the upward change from baseline.",
+        riskTone: "negative",
+        keyStats: [
+          { label: "Current", value: "98 mg/dL", tone: "negative" },
+          { label: "Baseline", value: "85 mg/dL" },
+          { label: "Change", value: "+13 mg/dL", tone: "negative" },
+        ],
         focusAreas: [
-          "Flagged or borderline results",
-          "Patterns across related markers",
-          "Questions for repeat testing",
+          "Current value",
+          "Baseline change",
+          "Next-step testing",
         ],
         recommendedQuestions: [
-          "Which result matters most clinically?",
-          "Do any values need repeat testing?",
-          "Could symptoms relate to nutrient or inflammation markers?",
+          "Is this rise clinically relevant for me?",
+          "Should I repeat fasting glucose or add HbA1c?",
+          "What lifestyle factors could explain this increase?",
         ],
         recommendations,
         shopRecommendations,
         clinicFollowUp:
-          "A follow-up clinic review can confirm which markers need trend monitoring, repeat testing, or treatment.",
+          "A follow-up visit can confirm whether this is a real metabolic trend and whether repeat fasting glucose, HbA1c, or other current markers are needed.",
       },
     };
   }
