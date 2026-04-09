@@ -88,72 +88,65 @@ function buildRecommendations(data: SubmittedCheckIn): Recommendation[] {
 
   if (water <= 4) {
     recommendations.push({
-      title: "Front-load hydration tomorrow",
-      detail:
-        "Aim for 2 glasses before lunch and keep one visible during the afternoon.",
+      title: "Increase fluids earlier",
+      detail: "Aim for 2 glasses before lunch and 1 in the afternoon.",
       reason:
-        "You logged low hydration, which can amplify afternoon fatigue and stress reactivity.",
+        "Low fluid intake may worsen fatigue and concentration later in the day.",
     });
   } else {
     recommendations.push({
-      title: "Keep the hydration rhythm steady",
+      title: "Maintain fluid intake",
       detail:
-        "You are close to a strong baseline. Spread glasses earlier in the day so evening catch-up is not needed.",
-      reason: "Your hydration is already a usable strength in this check-in.",
+        "Keep the same pattern and spread intake across the day.",
+      reason: "Your fluid intake is already within a helpful range.",
     });
   }
 
   if (fruitVeg <= 3 || data.mealRhythm !== "Regular meals") {
     recommendations.push({
-      title: "Stabilize the middle of the day",
-      detail:
-        "Anchor lunch with protein, fiber, and one easy produce item like fruit, salad, or soup.",
+      title: "Improve lunch structure",
+      detail: "Add protein, fiber, and one fruit or vegetable at lunch.",
       reason:
-        "The meal pattern suggests a realistic risk for a post-lunch energy dip rather than a major nutrition issue.",
+        "Meal timing and food quality may be contributing to lower afternoon energy.",
     });
   } else {
     recommendations.push({
-      title: "Protect what is already working",
-      detail:
-        "Repeat the same meal structure that felt easiest today instead of over-optimizing tomorrow.",
+      title: "Keep the meal pattern stable",
+      detail: "Use the same meal structure again tomorrow.",
       reason:
-        "Your meal quality and produce intake suggest consistency matters more than adding complexity.",
+        "Your meals appear consistent and supportive today.",
     });
   }
 
   if (activeMinutes === "0" || activeMinutes === "<15" || data.movementBreaks === "0") {
     recommendations.push({
-      title: "Add one intentional movement anchor",
-      detail:
-        "Choose a 10 to 15 minute walk after lunch or a short mobility block before dinner.",
+      title: "Add one short activity block",
+      detail: "Plan a 10 to 15 minute walk or mobility session tomorrow.",
       reason:
-        "The daily activity pattern is light, so a single reliable anchor is more realistic than a full workout target.",
+        "A short planned activity is realistic and may improve energy and focus.",
     });
   } else {
     recommendations.push({
-      title: "Convert movement into recovery support",
-      detail:
-        "Keep the activity, but use one lighter walk or mobility block as a stress reset instead of pushing intensity.",
+      title: "Use movement for recovery",
+      detail: "Keep activity light and use it to reduce stress.",
       reason:
-        "You already moved today, so the opportunity is using movement to support recovery, not just volume.",
+        "You were active today, so the next benefit is better recovery.",
     });
   }
 
   if (stress >= 7 || data.sleepSatisfaction === "Poor" || data.energyLevel === "Drained") {
     recommendations.push({
-      title: "Reduce friction tonight",
-      detail:
-        "Keep dinner simple, set a softer evening cutoff, and avoid making tomorrow morning harder than it needs to be.",
+      title: "Simplify the evening",
+      detail: "Keep dinner light and reduce stimulation before bed.",
       reason:
-        "The combination of stress, sleep, and energy suggests recovery capacity is the limiting factor right now.",
+        "Stress and recovery appear to be the main issues today.",
     });
   } else {
     recommendations.push({
-      title: "Maintain a calm evening runway",
-      detail:
-        "Use a predictable wind-down and avoid stacking stimulating tasks late in the day.",
+      title: "Keep the evening routine",
+      detail: "Use a consistent wind-down and avoid late tasks.",
       reason:
-        "Stress is manageable, so the focus should be preserving that rather than correcting a major issue.",
+        "Your recovery markers are stable and worth maintaining.",
     });
   }
 
@@ -166,14 +159,14 @@ function buildCoachIntro(data: SubmittedCheckIn, recommendations: Recommendation
   const water = Number(data.waterGlasses);
 
   return [
-    "I reviewed your check-in and there is a believable pattern here:",
-    `${data.dietQuality.toLowerCase()} meals, ${fruitVeg} produce servings, ${water} glasses of water, ${data.movementMinutes} of ${data.movementType.toLowerCase()} movement, stress ${stress}/10, and ${data.sleepSatisfaction.toLowerCase()} sleep with ${data.energyLevel.toLowerCase()} energy right now.`,
-    `The most interesting part is that your day is not broadly off track. It looks more like a realistic afternoon strain pattern: enough healthy intent, but some stress and recovery friction keeping you from feeling fully steady.`,
-    `I would start with these priorities: ${recommendations
+    "I reviewed your daily check-in.",
+    `${fruitVeg} produce servings, ${water} glasses of water, ${data.movementMinutes} of ${data.movementType.toLowerCase()} movement, stress ${stress}/10, ${data.sleepSatisfaction.toLowerCase()} sleep, and ${data.energyLevel.toLowerCase()} energy.`,
+    `Overall, the day looks mostly stable, with mild strain later in the day.`,
+    `Suggested priorities: ${recommendations
       .slice(0, 2)
       .map((item) => item.title.toLowerCase())
       .join(" and ")}.`,
-    "Ask me anything about why I suggested these, what to do tomorrow, or which recommendation matters most.",
+    "You can ask about the recommendations, next steps, or priorities.",
   ].join(" ");
 }
 
@@ -184,34 +177,34 @@ function getCoachReply(question: string, data: SubmittedCheckIn) {
   const fruitVeg = Number(data.fruitVeg);
 
   if (normalized.includes("why") && normalized.includes("hydr")) {
-    return `Hydration stood out because you logged ${water} glasses. That is not disastrous, but in a day with stress at ${stress}/10 it can make concentration and afternoon energy feel more fragile.`;
+    return `Hydration stood out because you logged ${water} glasses. This may contribute to lower energy and focus later in the day.`;
   }
 
   if (normalized.includes("what should i eat") || normalized.includes("meal")) {
-    return `I would keep it boring and effective: a protein-centered lunch with one produce anchor and a slow carb. The goal is stability, not perfection, because your check-in reads like a day that benefits from steadiness more than restriction.`;
+    return "A simple lunch with protein, fiber, and one fruit or vegetable would be a good next step.";
   }
 
   if (normalized.includes("exercise") || normalized.includes("movement") || normalized.includes("workout")) {
-    return `Based on ${data.movementMinutes} of ${data.movementType.toLowerCase()} movement today, I would not push harder just for the sake of it. A short walk or mobility block tomorrow is probably higher value than chasing a tougher session.`;
+    return `Based on today’s activity, a short walk or light mobility session would likely be more helpful than a harder workout.`;
   }
 
   if (normalized.includes("stress") || normalized.includes("sleep") || normalized.includes("energy")) {
-    return `The stress-sleep-energy cluster is the strongest explanation for your day. Stress at ${stress}/10 with ${data.sleepSatisfaction.toLowerCase()} sleep and ${data.energyLevel.toLowerCase()} energy suggests recovery is shaping everything else more than motivation is.`;
+    return `Stress, sleep, and energy are closely linked in this check-in. These appear to be the main drivers of how the day felt overall.`;
   }
 
   if (normalized.includes("most important") || normalized.includes("priority")) {
     if (stress >= 7) {
-      return "The highest priority is reducing recovery friction tonight. When stress is elevated, a calmer evening routine is likely to improve tomorrow more than squeezing in extra optimization today.";
+      return "The top priority is improving recovery tonight with a simpler and calmer evening.";
     }
 
     if (fruitVeg <= 3 || data.mealRhythm !== "Regular meals") {
-      return "The highest priority is stabilizing meals tomorrow, especially lunch. Your check-in suggests the day would improve most from consistency rather than from a major behavior overhaul.";
+      return "The top priority is improving meal consistency tomorrow, especially at lunch.";
     }
 
-    return "The highest priority is preserving your current baseline. Nothing here looks alarming, so the best move is reinforcing the habits that already kept the day fairly stable.";
+    return "The top priority is maintaining the habits that already worked well today.";
   }
 
-  return `Given this check-in, I would read the day as mostly functional with one or two friction points rather than a major breakdown. The best next step is to keep tomorrow simple: steady meals, one intentional movement block, and an easier evening runway.`;
+  return "This check-in suggests a mostly stable day with a few manageable issues. A simple and consistent plan for tomorrow is the best next step.";
 }
 
 function ChatBubble({ message }: { message: ChatMessage }) {
@@ -425,15 +418,14 @@ export default function DailyCheckInPage() {
 
               <div className="mt-7 space-y-4">
                 <p className="text-sm font-medium text-[var(--checkin-warm-text)]">
-                  Daily lifestyle pulse
+                  Daily check-in
                 </p>
                 <h1 className="max-w-[11ch] text-[2.7rem] leading-[0.92] font-semibold tracking-[-0.09em] text-foreground">
-                  Log today&apos;s health habits.
+                  Record today&apos;s health data.
                 </h1>
                 <p className="max-w-[32ch] text-sm leading-6 text-muted-foreground">
-                  Start with nourishment, move into activity, then close with
-                  stress, sleep, and energy so the flow matches how most people
-                  recall a day.
+                  Complete the form in a simple daily order: nutrition, movement,
+                  and recovery.
                 </p>
               </div>
             </div>
@@ -484,7 +476,7 @@ export default function DailyCheckInPage() {
                     )}
                   >
                     <span>11 daily prompts</span>
-                    <span>{isSummaryCompact ? `${completion}%` : "Quick to complete"}</span>
+                    <span>{isSummaryCompact ? `${completion}%` : "Short form"}</span>
                   </div>
                   <Progress value={completion} className="h-2.5 bg-white/14" />
                 </div>
@@ -516,12 +508,12 @@ export default function DailyCheckInPage() {
               <CheckInSectionCard
                 icon={Apple}
                 label="Nourishment"
-                title="Start with food and hydration."
-                description="Keep the first section close to how the day actually felt: meal quality, meal rhythm, produce, and fluids."
+                title="Nutrition and hydration"
+                description="Record meal quality, meal pattern, fruit and vegetables, and fluids."
               >
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold text-foreground">
-                    Self-reported diet quality
+                    Diet quality
                   </Label>
                   <CheckInChoiceChips
                     options={habitOptions.diet}
@@ -532,7 +524,7 @@ export default function DailyCheckInPage() {
 
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold text-foreground">
-                    Meal rhythm today
+                    Meal pattern
                   </Label>
                   <CheckInChoiceChips
                     options={habitOptions.meals}
@@ -568,6 +560,9 @@ export default function DailyCheckInPage() {
                     <p className="mt-1.5 text-sm font-semibold text-foreground">
                       produce servings
                     </p>
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground">
+                      Fruit and vegetables today
+                    </p>
                   </div>
                   <div className="rounded-3xl bg-[var(--checkin-brand)] p-5 text-white">
                     <p className="text-3xl font-semibold tracking-[-0.06em]">
@@ -576,6 +571,9 @@ export default function DailyCheckInPage() {
                     <p className="mt-1.5 text-sm text-[var(--checkin-white-text-soft)]">
                       glasses today
                     </p>
+                    <p className="mt-2 text-sm leading-5 text-[var(--checkin-white-text-soft)]">
+                      Daily fluid intake
+                    </p>
                   </div>
                 </div>
               </CheckInSectionCard>
@@ -583,12 +581,12 @@ export default function DailyCheckInPage() {
               <CheckInSectionCard
                 icon={Dumbbell}
                 label="Movement"
-                title="Capture what movement looked like today."
-                description="Daily movement is more useful here than weekly frequency, so the questions focus on type, total minutes, and whether the day included activity breaks."
+                title="Physical activity"
+                description="Record the main activity, active minutes, and movement breaks."
               >
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold text-foreground">
-                    Primary movement type
+                    Main activity
                   </Label>
                   <CheckInChoiceChips
                     options={habitOptions.movementType}
@@ -610,7 +608,7 @@ export default function DailyCheckInPage() {
 
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold text-foreground">
-                    Movement or stretch breaks
+                    Activity breaks
                   </Label>
                   <CheckInChoiceChips
                     options={habitOptions.movementBreaks}
@@ -626,11 +624,11 @@ export default function DailyCheckInPage() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm font-semibold text-foreground">
-                        Better daily signal
+                        Note
                       </p>
                       <p className="text-sm leading-5 text-muted-foreground">
-                        This makes the check-in feel current instead of asking
-                        users to mentally summarize an entire week.
+                        Daily activity data is easier to recall and more useful
+                        than weekly estimates.
                       </p>
                     </div>
                   </div>
@@ -640,8 +638,8 @@ export default function DailyCheckInPage() {
               <CheckInSectionCard
                 icon={MoonStar}
                 label="Recovery"
-                title="Close with stress, sleep, and energy."
-                description="These belong together because they shape how the day felt and usually explain the rest of the check-in."
+                title="Stress and recovery"
+                description="Record stress, sleep, and current energy."
               >
                 <div className="space-y-3.5">
                   <div className="flex items-center justify-between gap-3">
@@ -663,9 +661,9 @@ export default function DailyCheckInPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold text-foreground">
-                    Last night&apos;s sleep
-                  </Label>
+                    <Label className="text-sm font-semibold text-foreground">
+                      Sleep quality
+                    </Label>
                   <CheckInChoiceChips
                     options={habitOptions.sleep}
                     value={sleepSatisfaction}
@@ -674,9 +672,9 @@ export default function DailyCheckInPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold text-foreground">
-                    Energy right now
-                  </Label>
+                    <Label className="text-sm font-semibold text-foreground">
+                      Current energy
+                    </Label>
                   <CheckInChoiceChips
                     options={habitOptions.energy}
                     value={energyLevel}
@@ -708,12 +706,10 @@ export default function DailyCheckInPage() {
                       </Badge>
                       <div className="space-y-1.5">
                         <CardTitle className="text-[1.65rem] leading-tight tracking-[-0.06em]">
-                          Add anything that explains the day.
+                          Add context
                         </CardTitle>
                         <CardDescription className="max-w-[29ch]">
-                          Keep the last step open-ended for travel, overtime,
-                          illness, social events, or anything else affecting
-                          today&apos;s pattern.
+                          Add any factor that may have influenced today&apos;s results.
                         </CardDescription>
                       </div>
                     </div>
@@ -723,14 +719,14 @@ export default function DailyCheckInPage() {
                 <CardContent className="space-y-5 px-6 pb-6">
                   <div className="space-y-2.5">
                     <Label htmlFor="reflection" className="text-sm font-semibold">
-                      What shaped your habits today?
+                      Additional notes
                     </Label>
                     <textarea
                       id="reflection"
                       value={reflection}
                       onChange={(event) => setReflection(event.target.value)}
                       className="min-h-32 w-full rounded-3xl border border-input bg-white px-4 py-3.5 text-sm leading-6 text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground/80 focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/15"
-                      placeholder="Travel day, overtime, poor sleep, social plans, soreness, or anything else worth noting."
+                      placeholder="For example: travel, overtime, illness, or poor sleep."
                     />
                   </div>
                 </CardContent>
@@ -780,15 +776,14 @@ export default function DailyCheckInPage() {
 
               <div className="mt-7 space-y-4">
                 <p className="text-sm font-medium text-[var(--checkin-warm-text)]">
-                  Summary + recommendation chat
+                  Summary and recommendations
                 </p>
                 <h1 className="max-w-[12ch] text-[2.7rem] leading-[0.92] font-semibold tracking-[-0.09em] text-foreground">
-                  Your coach summary is ready.
+                  Your summary is ready.
                 </h1>
                 <p className="max-w-[33ch] text-sm leading-6 text-muted-foreground">
-                  This case reads like a realistic busy-day pattern: decent
-                  health intent overall, but recovery friction and afternoon
-                  strain are where the recommendations become useful.
+                  The results show a mostly stable day with a few areas to
+                  improve.
                 </p>
               </div>
             </div>
@@ -803,7 +798,7 @@ export default function DailyCheckInPage() {
                       Case summary
                     </p>
                     <h2 className="mt-1 text-[1.9rem] leading-none font-semibold tracking-[-0.07em]">
-                      Mostly steady, mildly strained
+                      Stable overall
                     </h2>
                   </div>
                   <div className="rounded-2xl bg-[var(--checkin-white-muted)] px-4 py-3 text-right backdrop-blur-sm">
@@ -811,7 +806,7 @@ export default function DailyCheckInPage() {
                       Main theme
                     </p>
                     <p className="mt-1 text-sm font-medium">
-                      Afternoon stress + recovery drag
+                      Mild recovery strain
                     </p>
                   </div>
                 </div>
@@ -867,12 +862,11 @@ export default function DailyCheckInPage() {
                       <Sparkles className="size-5" />
                     </div>
                     <div>
-                      <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
-                        Personalized recommendations
+                        <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
+                        Recommendations
                       </CardTitle>
                       <CardDescription className="mt-1 max-w-[31ch]">
-                        These are tailored to this specific check-in, not a
-                        generic wellness list.
+                        These recommendations are based on today&apos;s check-in.
                       </CardDescription>
                     </div>
                   </div>
@@ -909,12 +903,11 @@ export default function DailyCheckInPage() {
                       <MessageCircle className="size-5" />
                     </div>
                     <div>
-                      <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
-                        Ask about the recommendations
+                        <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
+                        Ask questions
                       </CardTitle>
                       <CardDescription className="mt-1 max-w-[31ch]">
-                        The coach can explain tradeoffs, suggest next steps, or
-                        tell you which recommendation matters most.
+                        You can ask about the recommendations or next steps.
                       </CardDescription>
                     </div>
                   </div>
@@ -931,7 +924,7 @@ export default function DailyCheckInPage() {
                     {[
                       "Why is hydration a focus?",
                       "What should I prioritize tomorrow?",
-                      "What kind of movement would help most?",
+                      "Which activity would help most?",
                     ].map((prompt) => (
                       <button
                         key={prompt}
@@ -955,7 +948,7 @@ export default function DailyCheckInPage() {
                       value={chatInput}
                       onChange={(event) => setChatInput(event.target.value)}
                       className="min-h-24 flex-1 rounded-3xl border border-input bg-white px-4 py-3.5 text-sm leading-6 text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground/80 focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/15"
-                      placeholder="Ask why these recommendations were chosen, what to do tomorrow, or how to improve one area without overdoing it."
+                      placeholder="Ask about the recommendations or next steps."
                     />
                     <Button
                       type="submit"
