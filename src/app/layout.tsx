@@ -1,42 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Navbar } from "@/components/ui/navbar";
 
 export const metadata: Metadata = {
-  title: "Auren Health Companion",
-  description: "A mobile-first health companion demo built with shadcn/ui.",
+    title: "BCG Health Companion Demo",
+    description: "A mobile-first prototype for the Chefftreff hackathon focused on making patient context easy to scan.",
 };
-
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={cn(geistSans.variable, geistMono.variable, "font-sans", inter.variable)}>
-      <body>
-        <div className="app-shell">
-          <div className="device-frame">
-            <div className="device-notch" aria-hidden="true" />
-            <div className="device-screen">
-              {children}
-            </div>
-          </div>
-        </div>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="de" suppressHydrationWarning>
+            <body suppressHydrationWarning>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <Navbar />
+                    {children}
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }
