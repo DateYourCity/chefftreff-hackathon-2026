@@ -79,12 +79,11 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             className="flex items-center gap-3 text-primary transition-colors hover:text-primary/90"
           >
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="BetterYou logo"
               width={34}
               height={34}
               className="rounded-xl"
-              priority
             />
             <div className="leading-tight">
               <p className="text-sm font-semibold text-foreground">
