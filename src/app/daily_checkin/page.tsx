@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Apple,
   ArrowLeft,
   Brain,
   Dumbbell,
-  Droplets,
   MoonStar,
   Sparkles,
 } from "lucide-react";
@@ -21,7 +20,12 @@ import {
 import { checkInTheme, checkInThemeVars } from "@/components/check-in/theme";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -33,67 +37,56 @@ const habitOptions = {
     "Convenience-heavy day",
     "Skipped or irregular meals",
   ],
-  exercise: ["0", "1-2", "3-4", "5+"],
+  meals: [
+    "Regular meals",
+    "Mostly regular",
+    "Skipped one meal",
+    "Very irregular",
+  ],
+  movementType: ["Walking", "Cardio", "Strength", "Mobility", "Mixed", "None"],
+  movementMinutes: ["0", "<15", "15-30", "30-45", "45-60", "60+"],
+  movementBreaks: ["0", "1-2", "3-4", "5+"],
   stress: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
   sleep: ["Poor", "Fair", "Good", "Restorative"],
+  energy: ["Drained", "Low", "Steady", "Good", "High"],
 };
-
-const dailyHighlights = [
-  {
-    label: "Diet pulse",
-    value: "4.5 servings",
-    tone: "Fruit and veg estimate",
-  },
-  {
-    label: "Activity",
-    value: "3-4 sessions",
-    tone: "Exercise frequency this week",
-  },
-  {
-    label: "Stress",
-    value: "4 / 10",
-    tone: "Low-to-moderate load",
-  },
-];
 
 export default function DailyCheckInPage() {
   const pageRef = useRef<HTMLElement | null>(null);
   const [dietQuality, setDietQuality] = useState("Balanced with a few treats");
-  const [exerciseFrequency, setExerciseFrequency] = useState("3-4");
+  const [mealRhythm, setMealRhythm] = useState("Mostly regular");
+  const [fruitVeg, setFruitVeg] = useState("4");
+  const [waterGlasses, setWaterGlasses] = useState("7");
+  const [movementType, setMovementType] = useState("Walking");
+  const [movementMinutes, setMovementMinutes] = useState("30-45");
+  const [movementBreaks, setMovementBreaks] = useState("3-4");
   const [stressLevel, setStressLevel] = useState("4");
   const [sleepSatisfaction, setSleepSatisfaction] = useState("Good");
-  const [fruitVeg, setFruitVeg] = useState("4.5");
-  const [waterGlasses, setWaterGlasses] = useState("7");
+  const [energyLevel, setEnergyLevel] = useState("Steady");
   const [reflection, setReflection] = useState(
-    "Lunch was balanced, stress rose a bit in the afternoon, and an evening walk helped."
+    "Meals felt balanced, I moved more after lunch, and stress was manageable once the afternoon rush passed."
   );
   const [isSummaryCompact, setIsSummaryCompact] = useState(false);
 
-  const completion = useMemo(() => {
-    const answers = [
-      dietQuality,
-      exerciseFrequency,
-      stressLevel,
-      sleepSatisfaction,
-      fruitVeg,
-      waterGlasses,
-      reflection,
-    ];
-
-    return Math.round(
-      (answers.filter((answer) => answer.trim().length > 0).length /
-        answers.length) *
-        100
-    );
-  }, [
+  const answeredFields = [
     dietQuality,
-    exerciseFrequency,
-    stressLevel,
-    sleepSatisfaction,
+    mealRhythm,
     fruitVeg,
     waterGlasses,
+    movementType,
+    movementMinutes,
+    movementBreaks,
+    stressLevel,
+    sleepSatisfaction,
+    energyLevel,
     reflection,
-  ]);
+  ];
+
+  const completion = Math.round(
+    (answeredFields.filter((answer) => answer.trim().length > 0).length /
+      answeredFields.length) *
+      100
+  );
 
   const stressTone =
     Number(stressLevel) <= 3
@@ -101,6 +94,24 @@ export default function DailyCheckInPage() {
       : Number(stressLevel) <= 6
         ? "Manageable load"
         : "Recovery needed";
+
+  const dailyHighlights = [
+    {
+      label: "Nourishment",
+      value: `${fruitVeg || "0"} servings`,
+      tone: mealRhythm,
+    },
+    {
+      label: "Movement",
+      value: movementMinutes,
+      tone: movementType,
+    },
+    {
+      label: "Recovery",
+      value: sleepSatisfaction,
+      tone: `${stressLevel}/10 stress`,
+    },
+  ];
 
   useEffect(() => {
     const pageElement = pageRef.current;
@@ -126,10 +137,7 @@ export default function DailyCheckInPage() {
     <main
       ref={pageRef}
       style={checkInThemeVars}
-      className={cn(
-        "relative flex min-h-full flex-col",
-        checkInTheme.root
-      )}
+      className={cn("relative flex min-h-full flex-col", checkInTheme.root)}
     >
       <div
         aria-hidden="true"
@@ -169,16 +177,16 @@ export default function DailyCheckInPage() {
           </div>
 
           <div className="mt-7 space-y-4">
-            {/*<p className="text-sm font-medium text-[var(--checkin-warm-text)]">
-              Lifestyle survey data
-            </p>*/}
+            <p className="text-sm font-medium text-[var(--checkin-warm-text)]">
+              Daily lifestyle pulse
+            </p>
             <h1 className="max-w-[11ch] text-[2.7rem] leading-[0.92] font-semibold tracking-[-0.09em] text-foreground">
               Log today&apos;s health habits.
             </h1>
-            {/*<p className="max-w-[31ch] text-sm leading-6 text-muted-foreground">
-              Capture self-reported diet quality, exercise frequency, stress
-              level, sleep, and hydration with a guided mobile-friendly survey.
-            </p>*/}
+            <p className="max-w-[32ch] text-sm leading-6 text-muted-foreground">
+              Start with nourishment, move into activity, then close with stress,
+              sleep, and energy so the flow matches how most people recall a day.
+            </p>
           </div>
         </div>
 
@@ -210,29 +218,6 @@ export default function DailyCheckInPage() {
                   {completion}% logged
                 </h2>
               </div>
-              {/*<div
-                className={cn(
-                  "rounded-2xl bg-[var(--checkin-white-muted)] text-right backdrop-blur-sm transition-all",
-                  isSummaryCompact ? "px-3 py-2" : "px-4 py-3"
-                )}
-              >
-                <p
-                  className={cn(
-                    "tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase transition-all",
-                    isSummaryCompact ? "text-[10px]" : "text-[11px]"
-                  )}
-                >
-                  Status
-                </p>
-                <p
-                  className={cn(
-                    "mt-1 font-medium transition-all",
-                    isSummaryCompact ? "text-xs" : "text-sm"
-                  )}
-                >
-                  {completion === 100 ? "Ready to save" : "Keep going"}
-                </p>
-              </div>*/}
             </div>
 
             <div
@@ -247,7 +232,7 @@ export default function DailyCheckInPage() {
                   isSummaryCompact ? "text-[11px]" : "text-xs"
                 )}
               >
-                <span>7 lifestyle prompts</span>
+                <span>11 daily prompts</span>
                 <span>{isSummaryCompact ? `${completion}%` : "Quick to complete"}</span>
               </div>
               <Progress value={completion} className="h-2.5 bg-white/14" />
@@ -279,9 +264,9 @@ export default function DailyCheckInPage() {
         <div className="mt-6 space-y-5">
           <CheckInSectionCard
             icon={Apple}
-            label="Nutrition"
-            title="How nourishing did your meals feel?"
-            description="Use natural language for the user while still mapping cleanly to structured survey data."
+            label="Nourishment"
+            title="Start with food and hydration."
+            description="Keep the first section close to how the day actually felt: meal quality, meal rhythm, produce, and fluids."
           >
             <div className="space-y-3">
               <Label className="text-sm font-semibold text-foreground">
@@ -291,6 +276,17 @@ export default function DailyCheckInPage() {
                 options={habitOptions.diet}
                 value={dietQuality}
                 onChange={setDietQuality}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground">
+                Meal rhythm today
+              </Label>
+              <CheckInChoiceChips
+                options={habitOptions.meals}
+                value={mealRhythm}
+                onChange={setMealRhythm}
               />
             </div>
 
@@ -304,18 +300,36 @@ export default function DailyCheckInPage() {
                   onChange={(next) => setFruitVeg(String(next))}
                 />
               </div>
+              <div className="space-y-2.5">
+                <Label className="text-sm font-semibold">Water glasses</Label>
+                <WaterGlassRating
+                  value={Number(waterGlasses) || 0}
+                  onChange={(next) => setWaterGlasses(String(next))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="rounded-3xl bg-[var(--checkin-warm-surface)] p-5">
-                {/*<p className="text-xs font-medium tracking-[0.18em] text-[var(--checkin-warm-text)] uppercase">
-                  Survey mapping
-                </p>*/}
-                <p className="mt-2.5 text-3xl font-semibold tracking-[-0.06em] text-foreground">
+                <p className="text-3xl font-semibold tracking-[-0.06em] text-foreground">
                   {fruitVeg || "0"}
                 </p>
                 <p className="mt-1.5 text-sm font-semibold text-foreground">
-                  servings today
+                  produce servings
                 </p>
                 {/*<p className="mt-2 text-sm leading-5 text-muted-foreground">
-                  Maps to `fruit_veg_servings_daily` alongside diet quality.
+                  Maps neatly to `fruit_veg_servings_daily`.
+                </p>*/}
+              </div>
+              <div className="rounded-3xl bg-[var(--checkin-brand)] p-5 text-white">
+                <p className="text-3xl font-semibold tracking-[-0.06em]">
+                  {waterGlasses || "0"}
+                </p>
+                <p className="mt-1.5 text-sm text-[var(--checkin-white-text-soft)]">
+                  glasses today
+                </p>
+                {/*<p className="mt-2 text-sm leading-5 text-[var(--checkin-white-text-soft)]">
+                  A simple daily hydration pulse.
                 </p>*/}
               </div>
             </div>
@@ -324,16 +338,39 @@ export default function DailyCheckInPage() {
           <CheckInSectionCard
             icon={Dumbbell}
             label="Movement"
-            title="How active have you been this week?"
+            title="Capture what movement looked like today."
+            description="Daily movement is more useful here than weekly frequency, so the questions focus on type, total minutes, and whether the day included activity breaks."
           >
             <div className="space-y-3">
               <Label className="text-sm font-semibold text-foreground">
-                Exercise frequency
+                Primary movement type
               </Label>
               <CheckInChoiceChips
-                options={habitOptions.exercise}
-                value={exerciseFrequency}
-                onChange={setExerciseFrequency}
+                options={habitOptions.movementType}
+                value={movementType}
+                onChange={setMovementType}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground">
+                Active minutes today
+              </Label>
+              <CheckInChoiceChips
+                options={habitOptions.movementMinutes}
+                value={movementMinutes}
+                onChange={setMovementMinutes}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground">
+                Movement or stretch breaks
+              </Label>
+              <CheckInChoiceChips
+                options={habitOptions.movementBreaks}
+                value={movementBreaks}
+                onChange={setMovementBreaks}
               />
             </div>
 
@@ -344,10 +381,11 @@ export default function DailyCheckInPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-foreground">
-                    Tip
+                    Better daily signal
                   </p>
                   <p className="text-sm leading-5 text-muted-foreground">
-                   Connect your fitness tracker for better data.
+                    This makes the check-in feel current instead of asking users
+                    to mentally summarize an entire week.
                   </p>
                 </div>
               </div>
@@ -355,10 +393,10 @@ export default function DailyCheckInPage() {
           </CheckInSectionCard>
 
           <CheckInSectionCard
-            icon={Brain}
-            label="Stress"
-            title="What does your stress level feel like?"
-            description="Keep the clinical 1 to 10 scale, but present it with softer framing."
+            icon={MoonStar}
+            label="Recovery"
+            title="Close with stress, sleep, and energy."
+            description="These belong together because they shape how the day felt and usually explain the rest of the check-in."
           >
             <div className="space-y-3.5">
               <div className="flex items-center justify-between gap-3">
@@ -378,22 +416,26 @@ export default function DailyCheckInPage() {
                 onChange={setStressLevel}
               />
             </div>
-          </CheckInSectionCard>
 
-          <CheckInSectionCard
-            icon={MoonStar}
-            label="Recovery"
-            title="How restorative was your sleep?"
-            description="A friendly recovery prompt helps the screen feel less like a spreadsheet and more like a guided check-in."
-          >
             <div className="space-y-3">
               <Label className="text-sm font-semibold text-foreground">
-                Sleep satisfaction
+                Last night&apos;s sleep
               </Label>
               <CheckInChoiceChips
                 options={habitOptions.sleep}
                 value={sleepSatisfaction}
                 onChange={setSleepSatisfaction}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground">
+                Energy right now
+              </Label>
+              <CheckInChoiceChips
+                options={habitOptions.energy}
+                value={energyLevel}
+                onChange={setEnergyLevel}
               />
             </div>
           </CheckInSectionCard>
@@ -407,7 +449,7 @@ export default function DailyCheckInPage() {
                     checkInTheme.softBrandSurface
                   )}
                 >
-                  <Droplets className="size-5" />
+                  <Brain className="size-5" />
                 </div>
                 <div className="space-y-3">
                   <Badge
@@ -417,15 +459,15 @@ export default function DailyCheckInPage() {
                       checkInTheme.softBadge
                     )}
                   >
-                    Hydration
+                    Context
                   </Badge>
                   <div className="space-y-1.5">
                     <CardTitle className="text-[1.65rem] leading-tight tracking-[-0.06em]">
-                      Add a couple of quick numeric entries.
+                      Add anything that explains the day.
                     </CardTitle>
                     <CardDescription className="max-w-[29ch]">
-                      Finish the survey with simple hydration data and an
-                      optional context note.
+                      Keep the last step open-ended for travel, overtime, illness,
+                      social events, or anything else affecting today&apos;s pattern.
                     </CardDescription>
                   </div>
                 </div>
@@ -433,68 +475,24 @@ export default function DailyCheckInPage() {
             </CardHeader>
 
             <CardContent className="space-y-5 px-6 pb-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
-                  <Label className="text-sm font-semibold">
-                    Water glasses
-                  </Label>
-                  <WaterGlassRating
-                    value={Number(waterGlasses) || 0}
-                    onChange={(next) => setWaterGlasses(String(next))}
-                  />
-                </div>
-                <div className="rounded-3xl bg-[var(--checkin-brand)] p-5 text-white">
-                  {/*<p className="text-xs tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
-                    Logged now
-                  </p>*/}
-                  <p className="mt-2.5 text-3xl font-semibold tracking-[-0.06em]">
-                    {waterGlasses || "0"}
-                  </p>
-                  <p className="mt-1.5 text-sm text-[var(--checkin-white-text-soft)]">
-                    glasses today
-                  </p>
-                </div>
-              </div>
-
-              {/*<Separator />*/}
-
-            </CardContent>
-
-            
-          </CheckInSurfaceCard>
-
-          <div className="space-y-2.5">
+              <div className="space-y-2.5">
                 <Label htmlFor="reflection" className="text-sm font-semibold">
-                  Anything affecting your routine today?
+                  What shaped your habits today?
                 </Label>
                 <textarea
                   id="reflection"
                   value={reflection}
                   onChange={(event) => setReflection(event.target.value)}
                   className="min-h-32 w-full rounded-3xl border border-input bg-white px-4 py-3.5 text-sm leading-6 text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground/80 focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/15"
-                  placeholder="Travel day, overtime, poor sleep, social plans, or anything else worth noting."
+                  placeholder="Travel day, overtime, poor sleep, social plans, soreness, or anything else worth noting."
                 />
               </div>
+            </CardContent>
+          </CheckInSurfaceCard>
         </div>
 
         <div className="mt-6 rounded-[2rem] border border-[var(--checkin-border)] bg-[var(--checkin-card)] p-5 shadow-lg shadow-[var(--checkin-shadow)] backdrop-blur-sm">
-          {/*<div className="flex items-start gap-3.5">
-            <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[var(--checkin-brand)] text-white">
-              <Check className="size-4" />
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-sm font-semibold text-foreground">
-                Submission preview
-              </p>
-              <p className="text-sm leading-5 text-muted-foreground">
-                This screen captures the core lifestyle survey inputs in a way
-                that is approachable for patients and straightforward to map
-                into structured records.
-              </p>
-            </div>
-          </div>*/}
-
-          <div className=" flex gap-3">
+          <div className="flex gap-3">
             <Button
               variant="outline"
               className="h-12 rounded-2xl border-[var(--checkin-border-strong)] bg-white px-5"
@@ -502,14 +500,10 @@ export default function DailyCheckInPage() {
               Preview data
             </Button>
             <Button
-              className={cn(
-                "h-12 flex-1 rounded-2xl",
-                checkInTheme.brandButton
-              )}
+              className={cn("h-12 flex-1 rounded-2xl", checkInTheme.brandButton)}
             >
               Save check-in
             </Button>
-            
           </div>
         </div>
       </section>
