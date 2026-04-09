@@ -5,7 +5,7 @@ export default function ChatLayout({
     children: React.ReactNode
 }) {
     return (
-        <main className="w-full pt-16">
+        <main className="w-full">
             {children}
         </main>
     )

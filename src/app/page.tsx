@@ -20,8 +20,8 @@ const INFO_ITEMS = [
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted px-6 py-12">
-            <section className="w-full max-w-2xl space-y-8 rounded-3xl border bg-card/90 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.12)] backdrop-blur">
+        <main className="flex min-h-full items-center justify-center bg-gradient-to-br from-background via-background to-muted px-6 py-12">
+            <section className="w-full max-w-2xl space-y-8 rounded-3xl border bg-card p-8 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
                 <div className="space-y-4 text-center">
                     <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                         Health companion for the hackathon
