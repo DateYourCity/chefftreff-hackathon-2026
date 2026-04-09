@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Paperclip, X } from "lucide-react";
+import { Database, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 type MessageRole = "assistant" | "user";
@@ -232,26 +232,29 @@ export default function ChatPage() {
                 className="absolute inset-x-0 bottom-0 border-t border-slate-200/90 bg-white/92 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur"
             >
                 <div className="mx-auto flex max-w-xl flex-col gap-2">
-                    {attachedFiles.length > 0 && (
-                        <div className="flex flex-wrap gap-2 px-1">
-                            {attachedFiles.map(({ id, file }) => (
-                                <div
-                                    key={id}
-                                    className="flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600"
-                                >
-                                    <span className="max-w-[11rem] truncate">{file.name}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeAttachedFile(id)}
-                                        className="inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
-                                        aria-label={`Remove ${file.name}`}
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </button>
-                                </div>
-                            ))}
+                    <div className="flex flex-wrap gap-2 px-1">
+                        <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
+                            <Database className="h-3.5 w-3.5 text-slate-500" />
+                            <span>Health Data</span>
                         </div>
-                    )}
+
+                        {attachedFiles.map(({ id, file }) => (
+                            <div
+                                key={id}
+                                className="flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600"
+                            >
+                                <span className="max-w-[11rem] truncate">{file.name}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => removeAttachedFile(id)}
+                                    className="inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
+                                    aria-label={`Remove ${file.name}`}
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
 
                     <div className="flex items-end gap-2 rounded-3xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
                         <input
