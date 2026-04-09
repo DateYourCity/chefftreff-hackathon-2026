@@ -4,6 +4,7 @@ import {
     ChevronRight,
     FileText,
     MapPin,
+    Sparkles,
     Stethoscope,
 } from "lucide-react";
 import { getHealthDocs } from "@/lib/health-docs";
@@ -91,6 +92,16 @@ const visitHistory = [
     },
 ];
 
+const futureAppointmentProposals = [
+    {
+        id: "proposal-01",
+        timeframe: "Suggested for May 2026",
+        doctor: "Dr. Mehmet Yilmaz",
+        specialty: "Cardiology",
+        reason: "Repeat ECG and check whether the palpitations have fully settled.",
+    },
+];
+
 type HealthDocsPageProps = PageProps<"/health_docs">;
 
 export default async function HealthDocsPage(props: HealthDocsPageProps) {
@@ -116,22 +127,24 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                 <div className="grid grid-cols-2 gap-1">
                     <Link
                         href="/health_docs"
-                        className={`rounded-[20px] px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
                             activeTab === "documents"
                                 ? "bg-primary text-white"
                                 : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
                         }`}
                     >
+                        <FileText className="h-4 w-4 shrink-0" />
                         Documents
                     </Link>
                     <Link
                         href="/health_docs?tab=visits"
-                        className={`rounded-[20px] px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
                             activeTab === "visits"
                                 ? "bg-primary text-white"
                                 : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
                         }`}
                     >
+                        <Stethoscope className="h-4 w-4 shrink-0" />
                         Doctor Visits
                     </Link>
                 </div>
@@ -162,6 +175,47 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                 </div>
             ) : (
                 <div className="mt-4 space-y-3">
+                    <div className="rounded-[26px] border border-primary/15 bg-[linear-gradient(135deg,rgba(70,120,96,0.10),rgba(255,255,255,0.94))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                        <div className="flex items-center gap-2 text-primary">
+                            <Sparkles className="h-4 w-4" />
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em]">
+                                Proposed Next Appointments
+                            </p>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                            Based on your recent visits, these follow-ups would make sense to schedule next.
+                        </p>
+
+                        <div className="mt-4 space-y-3">
+                            {futureAppointmentProposals.map((proposal) => (
+                                <article
+                                    key={proposal.id}
+                                    className="rounded-[22px] border border-primary/15 bg-[linear-gradient(180deg,rgba(229,242,235,0.96),rgba(243,249,245,0.98))] px-4 py-4"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                            <CalendarDays className="h-5 w-5" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-medium text-primary">
+                                                {proposal.timeframe}
+                                            </p>
+                                            <h2 className="mt-1 text-base font-semibold text-foreground">
+                                                {proposal.doctor}
+                                            </h2>
+                                            <p className="text-sm text-muted-foreground">
+                                                {proposal.specialty}
+                                            </p>
+                                            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                                                {proposal.reason}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    </div>
+
                     {visitHistory.map((visit) => (
                         <article
                             key={visit.id}
