@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 // Simple logo component for the navbar
-const Logo = (props: React.SVGAttributes<SVGElement>) => {
+const Logo = (props: React.SVGProps<SVGSVGElement>) => {
     return (
         <svg
             aria-label="Logo"
@@ -23,7 +23,7 @@ const Logo = (props: React.SVGAttributes<SVGElement>) => {
             viewBox="0 0 324 323"
             width="1em"
             xmlns="http://www.w3.org/2000/svg"
-            {...(props as any)}
+            {...props}
         >
             <rect fill="currentColor" height="323" rx="161.5" width="323" x="0.5" />
             <circle cx="162" cy="161.5" fill="white" r="60" />
@@ -32,7 +32,7 @@ const Logo = (props: React.SVGAttributes<SVGElement>) => {
 }
 
 // Hamburger icon component
-const HamburgerIcon = ({ className, ...props }: React.SVGAttributes<SVGElement>) => (
+const HamburgerIcon = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
     <svg
         aria-label="Menu"
         className={cn("pointer-events-none", className)}
@@ -46,7 +46,7 @@ const HamburgerIcon = ({ className, ...props }: React.SVGAttributes<SVGElement>)
         viewBox="0 0 24 24"
         width={16}
         xmlns="http://www.w3.org/2000/svg"
-        {...(props as any)}
+        {...props}
     >
         <path
             className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[315deg]"
@@ -70,7 +70,7 @@ export interface NavbarNavLink {
     active?: boolean
 }
 
-export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
+export interface NavbarProps extends React.ComponentPropsWithoutRef<"header"> {
     className?: string
 }
 
@@ -80,7 +80,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
         const containerRef = useRef<HTMLElement>(null)
 
         const navigationLinks: NavbarNavLink[] = [
-            { href: "/health_docs", label: "Health Docs" },
+            { href: "/medical_details", label: "Medical Details" },
             { href: "/home", label: "Home" },
             { href: "/chat", label: "Chat" },
             { href: "/daily_checkin", label: "Daily Checkin" },
@@ -122,12 +122,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
         return (
             <header
+                style={{width: "calc(100% + 10px)"}}
                 className={cn(
                     "sticky top-0 z-50 w-full border-b bg-background px-4 md:px-6",
                     className,
                 )}
                 ref={combinedRef}
-                {...(props as any)}
+                {...props}
             >
                 <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
                     {/* Left side */}
