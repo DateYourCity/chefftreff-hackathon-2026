@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Apple,
   ArrowLeft,
@@ -58,6 +58,7 @@ const dailyHighlights = [
 ];
 
 export default function DailyCheckInPage() {
+  const pageRef = useRef<HTMLElement | null>(null);
   const [dietQuality, setDietQuality] = useState("Balanced with a few treats");
   const [exerciseFrequency, setExerciseFrequency] = useState("3-4");
   const [stressLevel, setStressLevel] = useState("4");
@@ -67,6 +68,7 @@ export default function DailyCheckInPage() {
   const [reflection, setReflection] = useState(
     "Lunch was balanced, stress rose a bit in the afternoon, and an evening walk helped."
   );
+  const [isSummaryCompact, setIsSummaryCompact] = useState(false);
 
   const completion = useMemo(() => {
     const answers = [
@@ -101,11 +103,32 @@ export default function DailyCheckInPage() {
         ? "Manageable load"
         : "Recovery needed";
 
+  useEffect(() => {
+    const pageElement = pageRef.current;
+    const scrollContainer = pageElement?.closest(".device-screen");
+
+    if (!scrollContainer) {
+      return;
+    }
+
+    const handleScroll = () => {
+      setIsSummaryCompact(scrollContainer.scrollTop > 140);
+    };
+
+    handleScroll();
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <main
+      ref={pageRef}
       style={checkInThemeVars}
       className={cn(
-        "relative flex min-h-full flex-col overflow-hidden",
+        "relative flex min-h-full flex-col",
         checkInTheme.root
       )}
     >
@@ -162,55 +185,95 @@ export default function DailyCheckInPage() {
 
         <CheckInSurfaceCard
           className={cn(
-            "mt-7 animate-in fade-in slide-in-from-bottom-3 duration-500",
+            "sticky top-[4.5rem] z-20 mt-7 animate-in fade-in slide-in-from-bottom-3 duration-500 transition-all before:pointer-events-none before:absolute before:inset-x-5 before:-bottom-4 before:h-8 before:rounded-full before:bg-[var(--checkin-shadow)]/60 before:blur-2xl",
             checkInTheme.strongCard
           )}
         >
-          <CardContent className="p-6">
+          <CardContent
+            className={cn("transition-all", isSummaryCompact ? "p-4" : "p-6")}
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1.5">
-                <p className="text-sm text-[var(--checkin-white-text-soft)]">
+                <p
+                  className={cn(
+                    "text-[var(--checkin-white-text-soft)] transition-all",
+                    isSummaryCompact ? "text-xs" : "text-sm"
+                  )}
+                >
                   Check-in progress
                 </p>
-                <h2 className="text-[2rem] leading-none font-semibold tracking-[-0.07em]">
+                <h2
+                  className={cn(
+                    "leading-none font-semibold tracking-[-0.07em] transition-all",
+                    isSummaryCompact ? "text-[1.55rem]" : "text-[2rem]"
+                  )}
+                >
                   {completion}% logged
                 </h2>
               </div>
-              { /* 
-              <div className="rounded-2xl bg-[var(--checkin-white-muted)] px-4 py-3 text-right backdrop-blur-sm">
-                <p className="text-[11px] tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
-                  Outcome
+              {/*<div
+                className={cn(
+                  "rounded-2xl bg-[var(--checkin-white-muted)] text-right backdrop-blur-sm transition-all",
+                  isSummaryCompact ? "px-3 py-2" : "px-4 py-3"
+                )}
+              >
+                <p
+                  className={cn(
+                    "tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase transition-all",
+                    isSummaryCompact ? "text-[10px]" : "text-[11px]"
+                  )}
+                >
+                  Status
                 </p>
-                <p className="mt-1 text-sm font-medium">Ready to save</p> 
+                <p
+                  className={cn(
+                    "mt-1 font-medium transition-all",
+                    isSummaryCompact ? "text-xs" : "text-sm"
+                  )}
+                >
+                  {completion === 100 ? "Ready to save" : "Keep going"}
+                </p>
               </div>*/}
             </div>
 
-            <div className="mt-5 space-y-2.5">
-              <div className="flex items-center justify-between text-xs text-[var(--checkin-white-text-soft)]">
+            <div
+              className={cn(
+                "space-y-2.5 transition-all",
+                isSummaryCompact ? "mt-3" : "mt-5"
+              )}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-between text-[var(--checkin-white-text-soft)] transition-all",
+                  isSummaryCompact ? "text-[11px]" : "text-xs"
+                )}
+              >
                 <span>7 lifestyle prompts</span>
-                {/*<span>Quick to complete</span>*/}
+                <span>{isSummaryCompact ? `${completion}%` : "Quick to complete"}</span>
               </div>
               <Progress value={completion} className="h-2.5 bg-white/14" />
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-3">
-              {dailyHighlights.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-3xl border border-[var(--checkin-white-border)] bg-[var(--checkin-white-muted)] p-4 backdrop-blur-sm"
-                >
-                  <p className="text-[11px] tracking-[0.16em] text-[var(--checkin-white-text-faint)] uppercase">
-                    {item.label}
-                  </p>
-                  <p className="mt-2.5 text-base font-semibold tracking-[-0.04em]">
-                    {item.value}
-                  </p>
-                  <p className="mt-1.5 text-[11px] leading-4 text-[var(--checkin-white-text-muted)]">
-                    {item.tone}
-                  </p>
-                </div>
-              ))}
-            </div>
+            {!isSummaryCompact && (
+              <div className="mt-5 grid grid-cols-3 gap-3">
+                {dailyHighlights.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-3xl border border-[var(--checkin-white-border)] bg-[var(--checkin-white-muted)] p-4 backdrop-blur-sm"
+                  >
+                    <p className="text-[11px] tracking-[0.16em] text-[var(--checkin-white-text-faint)] uppercase">
+                      {item.label}
+                    </p>
+                    <p className="mt-2.5 text-base font-semibold tracking-[-0.04em]">
+                      {item.value}
+                    </p>
+                    <p className="mt-1.5 text-[11px] leading-4 text-[var(--checkin-white-text-muted)]">
+                      {item.tone}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </CheckInSurfaceCard>
 
