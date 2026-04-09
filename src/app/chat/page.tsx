@@ -485,12 +485,31 @@ export default function ChatPage() {
                     {context.document.keyStats.map((item) => (
                       <div
                         key={item.label}
-                        className="rounded-2xl bg-white px-3 py-2 ring-1 ring-slate-200"
+                        className={cn(
+                          "rounded-2xl px-3 py-2 ring-1",
+                          item.tone === "negative"
+                            ? "bg-rose-50 ring-rose-200"
+                            : "bg-white ring-slate-200"
+                        )}
                       >
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                        <p
+                          className={cn(
+                            "text-[11px] font-semibold uppercase tracking-[0.12em]",
+                            item.tone === "negative"
+                              ? "text-rose-600"
+                              : "text-slate-500"
+                          )}
+                        >
                           {item.label}
                         </p>
-                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                        <p
+                          className={cn(
+                            "mt-1 text-sm font-semibold",
+                            item.tone === "negative"
+                              ? "text-rose-700"
+                              : "text-slate-900"
+                          )}
+                        >
                           {item.value}
                         </p>
                       </div>
@@ -499,8 +518,22 @@ export default function ChatPage() {
                 )}
 
                 {context.document.riskCallout && (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2.5">
-                    <p className="text-sm font-medium text-amber-900">
+                  <div
+                    className={cn(
+                      "rounded-2xl border px-3 py-2.5",
+                      context.document.riskTone === "negative"
+                        ? "border-rose-200 bg-rose-50"
+                        : "border-amber-200 bg-amber-50"
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-sm font-medium",
+                        context.document.riskTone === "negative"
+                          ? "text-rose-800"
+                          : "text-amber-900"
+                      )}
+                    >
                       {context.document.riskCallout}
                     </p>
                   </div>

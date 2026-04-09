@@ -41,9 +41,11 @@ export type MedicalDocumentSummary = {
   label: string;
   summary: string;
   riskCallout?: string;
+  riskTone?: "neutral" | "negative";
   keyStats?: Array<{
     label: string;
     value: string;
+    tone?: "neutral" | "negative";
   }>;
   focusAreas: string[];
   recommendedQuestions: string[];
@@ -128,10 +130,11 @@ export function buildMedicalDocumentChatContext(input: {
           "This value is still sub-clinical, but the change from 85 to 98 mg/dL matters. The coach reads that shift as an early warning, not a harmless normal result.",
         riskCallout:
           "Normal range does not always mean normal for you. The key issue is the upward change from baseline.",
+        riskTone: "negative",
         keyStats: [
-          { label: "Current", value: "98 mg/dL" },
+          { label: "Current", value: "98 mg/dL", tone: "negative" },
           { label: "Baseline", value: "85 mg/dL" },
-          { label: "Change", value: "+13 mg/dL" },
+          { label: "Change", value: "+13 mg/dL", tone: "negative" },
         ],
         focusAreas: [
           "Current value",
