@@ -74,7 +74,7 @@ export default function HomePage() {
                             Biological Age
                         </p>
                         <p className="mt-2 text-3xl font-semibold text-slate-950">
-                            {isBubblesShown ? "37" : "Loading..."}
+                            {isBubblesShown ? "46" : "Loading..."}
                         </p>
                     </div>
                 </div>

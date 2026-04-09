@@ -7,19 +7,19 @@ const vitalBubbles = [
     {
         id: "blood-sugar",
         label: "Blood Sugar",
-        value: <>98 <span className="text-sm">mg/dL</span></>,
+        value: <>87 <span className="text-sm">mg/dL</span></>,
         source: "EHR",
-        tone: "from-rose-500 to-red-600",
-        textTone: "text-rose-50",
+        tone: "from-yellow-300 to-yellow-400",
+        textTone: "text-yellow-950",
         position: "left-1 top-12",
     },
     {
         id: "sleep",
         label: "Sleep",
-        value: "4.4 / 10",
+        value: "8.4 / 10",
         source: "Apple Watch",
-        tone: "from-rose-500 to-red-600",
-        textTone: "text-rose-50",
+        tone: "from-emerald-400 to-green-500",
+        textTone: "text-emerald-950",
         position: "right-1 top-12",
     },
     {
@@ -34,10 +34,10 @@ const vitalBubbles = [
     {
         id: "stress-level",
         label: "Stress Level",
-        value: "??",
+        value: "Low",
         source: "Checkin",
-        tone: "from-slate-400 to-zinc-500",
-        textTone: "text-slate-950",
+        tone: "from-emerald-400 to-green-500",
+        textTone: "text-emerald-950",
         position: "right-3 bottom-14",
     },
 
@@ -74,7 +74,7 @@ export default function HomePage() {
                             Biological Age
                         </p>
                         <p className="mt-2 text-3xl font-semibold text-slate-950">
-                            {isBubblesShown ? "37" : "Loading..."}
+                            {isBubblesShown ? "42" : "Loading..."}
                         </p>
                     </div>
                 </div>
