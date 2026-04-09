@@ -284,17 +284,17 @@ export default function DailyCheckInPage() {
 
   const dailyHighlights = [
     {
-      label: "Nourishment",
+      label: "Nourish",
       value: `${fruitVeg || "0"} servings`,
       tone: mealRhythm,
     },
     {
-      label: "Movement",
+      label: "Move",
       value: movementMinutes,
       tone: movementType,
     },
     {
-      label: "Recovery",
+      label: "Recover",
       value: sleepSatisfaction,
       tone: `${stressLevel}/10 stress`,
     },
@@ -819,7 +819,7 @@ export default function DailyCheckInPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-3xl border border-[var(--checkin-white-border)] bg-[var(--checkin-white-muted)] p-4">
                     <p className="text-[11px] tracking-[0.16em] text-[var(--checkin-white-text-faint)] uppercase">
-                      Food
+                      Nourish
                     </p>
                     <p className="mt-2 text-base font-semibold">
                       {submittedCheckIn.dietQuality}
@@ -830,7 +830,7 @@ export default function DailyCheckInPage() {
                   </div>
                   <div className="rounded-3xl border border-[var(--checkin-white-border)] bg-[var(--checkin-white-muted)] p-4">
                     <p className="text-[11px] tracking-[0.16em] text-[var(--checkin-white-text-faint)] uppercase">
-                      Movement
+                      Move
                     </p>
                     <p className="mt-2 text-base font-semibold">
                       {submittedCheckIn.movementMinutes}
@@ -841,7 +841,7 @@ export default function DailyCheckInPage() {
                   </div>
                   <div className="rounded-3xl border border-[var(--checkin-white-border)] bg-[var(--checkin-white-muted)] p-4">
                     <p className="text-[11px] tracking-[0.16em] text-[var(--checkin-white-text-faint)] uppercase">
-                      Recovery
+                      Recover
                     </p>
                     <p className="mt-2 text-base font-semibold">
                       {submittedCheckIn.sleepSatisfaction}
