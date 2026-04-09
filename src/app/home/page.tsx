@@ -1,8 +1,28 @@
 "use client";
 
+import userData from "@/app/chat/user_data.json";
 import SimpleDAEViewer from "@/components/three-avatar";
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+type CompactTable = {
+    c: string[];
+    v: string[][];
+};
+
+function tableRowToRecord(table: CompactTable, rowIndex = 0): Record<string, string> {
+    const row = table.v[rowIndex] ?? [];
+    return Object.fromEntries(table.c.map((column, index) => [column, row[index] ?? ""])) as Record<string, string>;
+}
+
+function toNumber(value: string | undefined): number | null {
+    if (!value) {
+        return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+}
 
 const animationOptions = [
     { id: "neutral-idle", label: "Neutral Idle", modelPath: "/models/Neutral Idle.dae" },
@@ -26,6 +46,43 @@ export default function HomePage() {
         [activeAnimationId]
     );
 
+    const healthInsights = useMemo(() => {
+        const ehr = tableRowToRecord(userData.ehr as CompactTable, 0);
+        const lifestyle = tableRowToRecord(userData.life as CompactTable, 0);
+        const wearRows = (userData.wear as CompactTable).v;
+
+        const latestWearRecord = tableRowToRecord(userData.wear as CompactTable, Math.max(wearRows.length - 1, 0));
+        const recentWearRows = wearRows.slice(-7);
+
+        const stepsIndex = (userData.wear as CompactTable).c.indexOf("steps");
+        const avgSteps7d =
+            stepsIndex >= 0 && recentWearRows.length > 0
+                ? Math.round(
+                    recentWearRows.reduce((sum, row) => sum + (toNumber(row[stepsIndex]) ?? 0), 0) /
+                    recentWearRows.length
+                )
+                : null;
+
+        const hba1c = toNumber(ehr.hba1c_pct);
+        const sleepHours = toNumber(latestWearRecord.sleep_duration_hrs);
+        const activitySessions = toNumber(lifestyle.exercise_sessions_weekly);
+
+        return {
+            demographics: `Age ${ehr.age ?? "-"}, BMI ${ehr.bmi ?? "-"}, ${ehr.country ?? "-"}`,
+            glucose: hba1c
+                ? `HbA1c ${hba1c.toFixed(1)}% (${hba1c >= 7 ? "above target" : "in range"})`
+                : "HbA1c unavailable",
+            activity: avgSteps7d
+                ? `7-day average ${avgSteps7d.toLocaleString()} steps/day, ${activitySessions ?? "-"} exercise sessions/week`
+                : "Activity data unavailable",
+            recovery: sleepHours
+                ? `Latest sleep ${sleepHours.toFixed(1)}h, quality ${latestWearRecord.sleep_quality_score ?? "-"}/100`
+                : "Sleep data unavailable",
+            cardio: `Resting HR ${latestWearRecord.resting_hr_bpm ?? "-"} bpm, HRV ${latestWearRecord.hrv_rmssd_ms ?? "-"} ms`,
+            conditions: (ehr.chronic_conditions ?? "").split("|").join(", "),
+        };
+    }, []);
+
     useEffect(() => {
         currentOffsetRef.current = sheetOffset;
     }, [sheetOffset]);
@@ -36,7 +93,7 @@ export default function HomePage() {
             return;
         }
 
-        const PEEK_HEIGHT = 92;
+        const PEEK_HEIGHT = 140;
 
         const updateTravelDistance = () => {
             const nextTravel = Math.max(sheetElement.getBoundingClientRect().height - PEEK_HEIGHT, 0);
@@ -145,26 +202,25 @@ export default function HomePage() {
                     >
                         <div className="mx-auto h-1.5 w-12 rounded-full bg-emerald-300" />
                         <div className="mt-3 flex items-center justify-between">
-                            <h2 className="text-base font-semibold text-emerald-950">Coach Notes</h2>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-emerald-300/90 text-emerald-900"
-                                onClick={() => updateSheetOpenState(!isSheetOpen)}
-                            >
-                                {isSheetOpen ? "Collapse" : "Expand"}
-                            </Button>
+                            <h2 className="text-base font-semibold text-emerald-950">Hi Thomas!</h2>
                         </div>
                     </div>
 
                     <div className="space-y-3 px-5 pb-6">
                         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Daily focus</p>
-                            <p className="mt-1 text-sm text-emerald-950">Try the Neutral Idle animation before check-in to calibrate posture and breath baseline.</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Profile snapshot</p>
+                            <p className="mt-1 text-sm text-emerald-950">{healthInsights.demographics}</p>
+                            <p className="mt-1 text-sm text-emerald-950">Conditions: {healthInsights.conditions || "None listed"}</p>
                         </div>
                         <div className="rounded-2xl border border-teal-100 bg-teal-50/70 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-700/80">Quick reminder</p>
-                            <p className="mt-1 text-sm text-teal-950">Pull this sheet up anytime to show additional coaching cards, progress, and suggested routines.</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-700/80">Metabolic insight</p>
+                            <p className="mt-1 text-sm text-teal-950">{healthInsights.glucose}</p>
+                        </div>
+                        <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-3">
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-700/80">Movement and recovery</p>
+                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.activity}</p>
+                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.recovery}</p>
+                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.cardio}</p>
                         </div>
                     </div>
                 </div>
