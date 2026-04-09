@@ -108,8 +108,8 @@ function getDailyCheckInShopRecommendations(
             title: "Electrolyte support",
             detail:
                 "Consider an electrolyte mix on heavier or lower-intake days to support hydration.",
-            href: "https://drinklmnt.com/products/lmnt-recharge-electrolyte-drink",
-            linkLabel: "View LMNT",
+            href: "https://example.com",
+            linkLabel: "Buy here",
         });
     }
 
@@ -118,8 +118,8 @@ function getDailyCheckInShopRecommendations(
             title: "Magnesium glycinate",
             detail:
                 "If appropriate for you, magnesium glycinate may be worth discussing for evening recovery support.",
-            href: "https://www.thorne.com/products/dp/magnesium-glycinate",
-            linkLabel: "View Thorne",
+            href: "https://example.com",
+            linkLabel: "Buy here",
         });
     }
 

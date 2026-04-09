@@ -33,6 +33,38 @@ const habitOptions = {
   stress: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
 } as const;
 
+function getSupplementRecommendation(data: SubmittedCheckIn) {
+  const stress = Number(data.stressLevel);
+  const water = Number(data.waterGlasses);
+
+  if (water <= 4) {
+    return {
+      title: "Electrolyte support",
+      detail:
+        "An electrolyte drink mix may help support hydration on low-intake days.",
+      note: "This fits the low water intake recorded in today’s check-in.",
+      href: "https://drinklmnt.com/products/lmnt-recharge-electrolyte-drink",
+    };
+  }
+
+  if (stress >= 7) {
+    return {
+      title: "Magnesium glycinate",
+      detail:
+        "Magnesium glycinate may be worth discussing for evening recovery support.",
+      note: "This fits the higher stress level recorded today.",
+      href: "https://www.thorne.com/products/dp/magnesium-glycinate",
+    };
+  }
+
+  return {
+    title: "Electrolyte support",
+    detail: "A simple hydration support product can help maintain fluid balance.",
+    note: "This is an optional suggestion based on your daily check-in.",
+    href: "https://drinklmnt.com/products/lmnt-recharge-electrolyte-drink",
+  };
+}
+
 function buildRecommendations(data: SubmittedCheckIn): Recommendation[] {
   const recommendations: Recommendation[] = [];
   const stress = Number(data.stressLevel);
@@ -126,6 +158,9 @@ export default function DailyCheckInPage() {
   const submittedRecommendations = submittedCheckIn
     ? buildRecommendations(submittedCheckIn)
     : [];
+  const supplementRecommendation = submittedCheckIn
+    ? getSupplementRecommendation(submittedCheckIn)
+    : null;
 
   useEffect(() => {
     const pageElement = pageRef.current;
@@ -347,12 +382,6 @@ export default function DailyCheckInPage() {
                       Hydration and stress alert
                     </h2>
                   </div>
-                  <div className="rounded-2xl bg-[var(--checkin-white-muted)] px-4 py-3 text-right backdrop-blur-sm">
-                    <p className="text-[11px] tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
-                      Main theme
-                    </p>
-                    <p className="mt-1 text-sm font-medium">Quick daily review</p>
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -423,6 +452,47 @@ export default function DailyCheckInPage() {
                   ))}
                 </CardContent>
               </CheckInSurfaceCard>
+
+              {supplementRecommendation && (
+                <CheckInSurfaceCard>
+                  <CardHeader className="gap-4 px-6 pt-6 pb-5">
+                    <div>
+                      <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
+                        Suggested supplement
+                      </CardTitle>
+                      <CardDescription className="mt-1 max-w-[31ch]">
+                        Optional support based on today&apos;s check-in.
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4 px-6 pb-6">
+                    <div className="rounded-3xl border border-[var(--checkin-border)] bg-white/80 p-4">
+                      <p className="text-sm font-semibold text-foreground">
+                        {supplementRecommendation.title}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {supplementRecommendation.detail}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-[var(--checkin-warm-text)]">
+                        {supplementRecommendation.note}
+                      </p>
+                    </div>
+
+                    <Button
+                      asChild
+                      className={cn("h-14 w-full rounded-2xl text-base", checkInTheme.brandButton)}
+                    >
+                      <a
+                        href={supplementRecommendation.href}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Buy here
+                      </a>
+                    </Button>
+                  </CardContent>
+                </CheckInSurfaceCard>
+              )}
 
               <div className="rounded-[2rem] border border-[var(--checkin-border)] bg-[var(--checkin-card)] p-5 shadow-lg shadow-[var(--checkin-shadow)] backdrop-blur-sm">
                 <div className="space-y-2">
