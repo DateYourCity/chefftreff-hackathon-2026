@@ -1,202 +1,176 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-import Link from "next/link"
+  Database,
+  FileText,
+  Home,
+  Menu,
+  MessageCircle,
+} from "lucide-react";
 
-// Hamburger icon component
-const HamburgerIcon = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        aria-label="Menu"
-        className={cn("pointer-events-none", className)}
-        fill="none"
-        height={16}
-        role="img"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        width={16}
-        xmlns="http://www.w3.org/2000/svg"
-        {...props}
-    >
-        <path
-            className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[315deg]"
-            d="M4 12L20 12"
-        />
-        <path
-            className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
-            d="M4 12H20"
-        />
-        <path
-            className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[135deg]"
-            d="M4 12H20"
-        />
-    </svg>
-)
-
-// Types
-export interface NavbarNavLink {
-    href: string
-    label: string
-    active?: boolean
-}
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export interface NavbarProps extends React.ComponentPropsWithoutRef<"header"> {
-    className?: string
+  className?: string;
 }
 
+export interface BottomNavProps
+  extends React.ComponentPropsWithoutRef<"nav"> {
+  className?: string;
+}
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive: (pathname: string) => boolean;
+};
+
+const primaryNavItems: NavItem[] = [
+  {
+    href: "/chat",
+    label: "Chat",
+    icon: MessageCircle,
+    isActive: (pathname) => pathname.startsWith("/chat"),
+  },
+  {
+    href: "/home",
+    label: "Home",
+    icon: Home,
+    isActive: (pathname) => pathname === "/" || pathname.startsWith("/home"),
+  },
+  {
+    href: "/medical_details",
+    label: "Medical",
+    icon: FileText,
+    isActive: (pathname) => pathname.startsWith("/medical_details"),
+  },
+];
+
+const secondaryNavItems = [
+  { href: "/daily_checkin", label: "Daily Check-in", icon: Database },
+  { href: "/data_connections", label: "Data Connections", icon: Database },
+];
+
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
-    ({ className, ...props }, ref) => {
-        const [isMobile, setIsMobile] = useState(false)
-        const containerRef = useRef<HTMLElement>(null)
+  ({ className, ...props }, ref) => {
+    return (
+      <header
+        ref={ref}
+        className={cn(
+          "sticky top-0 z-50 border-b border-border/70 bg-background/95 px-4 backdrop-blur",
+          className
+        )}
+        {...props}
+      >
+        <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+          <Link
+            href="/home"
+            className="flex items-center gap-3 text-primary transition-colors hover:text-primary/90"
+          >
+            <Image
+              src="/logo.svg"
+              alt="BetterYou logo"
+              width={34}
+              height={34}
+              className="rounded-xl"
+            />
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-foreground">
+                BetterYou
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Connect the dots.
+              </p>
+            </div>
+          </Link>
 
-        const navigationLinks: NavbarNavLink[] = [
-            { href: "/medical_details", label: "Medical Details" },
-            { href: "/data_connections", label: "Data Connections" },
-            { href: "/home", label: "Home" },
-            { href: "/chat", label: "Chat" },
-            { href: "/daily_checkin", label: "Daily Checkin" },
-        ];
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full border-border/70 bg-background/80"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 rounded-2xl p-2">
+              <div className="space-y-1">
+                {secondaryNavItems.map((item) => {
+                  const Icon = item.icon;
 
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/85 transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </header>
+    );
+  }
+);
 
-        useEffect(() => {
-            const checkWidth = () => {
-                if (containerRef.current) {
-                    const width = containerRef.current.offsetWidth
-                    setIsMobile(width < 768) // 768px is md breakpoint
-                }
-            }
+Navbar.displayName = "Navbar";
 
-            checkWidth()
+export const BottomNav = React.forwardRef<HTMLElement, BottomNavProps>(
+  ({ className, ...props }, ref) => {
+    const pathname = usePathname();
 
-            const resizeObserver = new ResizeObserver(checkWidth)
-            if (containerRef.current) {
-                resizeObserver.observe(containerRef.current)
-            }
+    return (
+      <nav
+        ref={ref}
+        className={cn(
+          "z-40 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3",
+          className
+        )}
+        {...props}
+      >
+        <div className="mx-auto flex max-w-md items-center justify-between rounded-[28px] border border-border/70 bg-background/95 px-3 py-2 shadow-[0_18px_50px_rgba(15,23,42,0.16)] backdrop-blur">
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.isActive(pathname);
 
-            return () => {
-                resizeObserver.disconnect()
-            }
-        }, [])
-
-        // Combine refs
-        const combinedRef = React.useCallback(
-            (node: HTMLElement | null) => {
-                containerRef.current = node
-                if (typeof ref === "function") {
-                    ref(node)
-                } else if (ref) {
-                    ref.current = node
-                }
-            },
-            [ref],
-        )
-
-        return (
-            <header
-                style={{width: "calc(100% + 10px)"}}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
                 className={cn(
-                    "sticky top-0 z-50 w-full border-b bg-background px-4 md:px-6",
-                    className,
+                  "flex min-w-[88px] flex-col items-center justify-center gap-1 rounded-2xl px-4 py-2 text-xs font-medium transition-all",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
-                ref={combinedRef}
-                {...props}
-            >
-                <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
-                    {/* Left side */}
-                    <div className="flex items-center gap-2">
-                        {/* Mobile menu trigger */}
-                        {isMobile && (
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-                                        size="icon"
-                                        variant="ghost"
-                                    >
-                                        <HamburgerIcon />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent align="start" className="w-48 p-2">
-                                    <NavigationMenu className="max-w-none">
-                                        <NavigationMenuList className="flex-col items-start gap-1">
-                                            {navigationLinks.map((link, index) => (
-                                                <NavigationMenuItem className="w-full" key={index}>
-                                                    <Link
-                                                        href={link.href}
-                                                        className={cn(
-                                                            "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                                                            link.active
-                                                                ? "bg-accent text-accent-foreground"
-                                                                : "text-foreground/80",
-                                                        )}
-                                                    >
-                                                        {link.label}
-                                                    </Link>
-                                                </NavigationMenuItem>
-                                            ))}
-                                        </NavigationMenuList>
-                                    </NavigationMenu>
-                                </PopoverContent>
-                            </Popover>
-                        )}
-                        {/* Main nav */}
-                        <div className="flex items-center gap-6">
-                            <Link
-                                href="/"
-                                className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors"
-                            >
-                                <Image
-                                    src="/logo.png"
-                                    alt="BetterYou logo"
-                                    width={32}
-                                    height={32}
-                                    className="rounded-md"
-                                    priority
-                                />
-                                <span className="font-bold text-xl">BetterYou</span>
-                            </Link>
-                            {/* Navigation menu */}
-                            {!isMobile && (
-                                <NavigationMenu className="flex">
-                                    <NavigationMenuList className="gap-1">
-                                        {navigationLinks.map((link, index) => (
-                                            <NavigationMenuItem key={index}>
-                                                <Link
-                                                    href={link.href}
-                                                    className={cn(
-                                                        "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-                                                        link.active
-                                                            ? "bg-accent text-accent-foreground"
-                                                            : "text-foreground/80 hover:text-foreground",
-                                                    )}
-                                                >
-                                                    {link.label}
-                                                </Link>
-                                            </NavigationMenuItem>
-                                        ))}
-                                    </NavigationMenuList>
-                                </NavigationMenu>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </header>
-        )
-    },
-)
+              >
+                <Icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  }
+);
 
-Navbar.displayName = "Navbar"
-
-export { HamburgerIcon }
+BottomNav.displayName = "BottomNav";
