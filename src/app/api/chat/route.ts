@@ -1,3 +1,5 @@
+import userData from "../../chat/user_data.json";
+
 type IncomingMessage = {
     role: "user" | "assistant";
     content: string;
@@ -14,6 +16,15 @@ type LangdockResponse = {
         };
     }>;
 };
+
+const USER_DATA_CONTEXT = JSON.stringify(userData);
+
+const BASE_SYSTEM_PROMPT =
+    "You are a helpful health assistant demo. Be concise, calm, and practical. Keep responses short and user-friendly.";
+
+const USER_CONTEXT_SYSTEM_PROMPT =
+    "Use the following user profile as factual context for this conversation. Prioritize it over assumptions, and if asked about unavailable details, say they are not present in the profile.\n\n" +
+    USER_DATA_CONTEXT;
 
 export async function POST(request: Request) {
     try {
@@ -45,8 +56,11 @@ export async function POST(request: Request) {
                     messages: [
                         {
                             role: "system",
-                            content:
-                                "You are a helpful health assistant demo. Be concise, calm, and practical. Keep responses short and user-friendly.",
+                            content: BASE_SYSTEM_PROMPT,
+                        },
+                        {
+                            role: "system",
+                            content: USER_CONTEXT_SYSTEM_PROMPT,
                         },
                         ...messages,
                     ],
