@@ -1,4 +1,12 @@
-import { ArrowLeft, CalendarDays, MapPin, Sparkles, Stethoscope } from "lucide-react";
+import {
+    ArrowLeft,
+    CalendarDays,
+    ChevronRight,
+    FileText,
+    MapPin,
+    Sparkles,
+    Stethoscope,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -25,6 +33,37 @@ export default async function VisitDetailPage(
         visit.status === "upcoming"
             ? "This visit is scheduled. Use this view to confirm the time, place, and reason for the appointment before you go."
             : "This visit is complete. The summary below keeps the key details in one place for quick review.";
+    const documents =
+        visit.status === "upcoming"
+            ? [
+                {
+                    id: "prep-sheet",
+                    label: "Pre-visit preparation sheet",
+                    meta: "Instructions",
+                },
+                {
+                    id: "consent-form",
+                    label: "Digital consent form",
+                    meta: "Required before check-in",
+                },
+            ]
+            : [
+                {
+                    id: "visit-summary",
+                    label: "Visit summary",
+                    meta: "Clinical note",
+                },
+                {
+                    id: "lab-results",
+                    label: "Lab results",
+                    meta: "PDF report",
+                },
+                {
+                    id: "care-plan",
+                    label: "Care plan",
+                    meta: "Follow-up guidance",
+                },
+            ];
 
     return (
         <section className="min-h-full bg-[linear-gradient(180deg,#f8f5eb_0%,#f4f6fb_52%,#eef3f8_100%)] px-4 py-5">
@@ -96,6 +135,35 @@ export default async function VisitDetailPage(
                     <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         {visit.summary}
                     </p>
+                </div>
+
+                <div className="rounded-[26px] border border-white/70 bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                        <FileText className="h-4 w-4" />
+                        Documents
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                        {documents.map((document) => (
+                            <div
+                                key={document.id}
+                                className="flex items-center gap-3 rounded-2xl border border-border/70 bg-muted/20 px-3 py-3"
+                            >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                    <FileText className="h-4 w-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-semibold text-foreground">
+                                        {document.label}
+                                    </p>
+                                    <p className="truncate text-xs text-muted-foreground">
+                                        {document.meta}
+                                    </p>
+                                </div>
+                                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="rounded-[26px] border border-emerald-200/80 bg-[linear-gradient(180deg,rgba(236,248,241,0.96),rgba(255,255,255,0.98))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.05)]">
