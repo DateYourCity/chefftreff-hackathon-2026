@@ -1,5 +1,6 @@
 "use client";
 
+import Sheet from "@/app/avatar/intro/sheet";
 import { useEffect, useRef, useState } from "react";
 
 const vitalBubbles = [
@@ -63,7 +64,7 @@ export default function HomePage() {
     }, []);
 
     return (
-        <section className="h-full w-full bg-white px-4 pb-5 pt-4">
+        <section className="h-full w-full bg-white px-4 pb-5 pt-4 relative">
             <div className="relative mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden rounded-[32px] border border-slate-200/80 bg-white px-5 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
                 <div className="pointer-events-none absolute inset-x-4 top-0 h-28 rounded-full" />
 
@@ -85,13 +86,15 @@ export default function HomePage() {
                             <video
                                 ref={videoRef}
                                 style={{
-                                    marginTop: "-90px"
+                                    marginTop: "-90px",
+                                    width: "260px",
+                                    height: "420px",
                                 }}
                                 src="/avatar/wave_sad.mp4"
                                 muted
                                 loop
                                 playsInline
-                                className="h-full w-full object-cover"
+                                className="object-cover"
                             />
                         </div>
 
@@ -123,6 +126,9 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
+
+            <Sheet />
+
         </section>
     );
 }
