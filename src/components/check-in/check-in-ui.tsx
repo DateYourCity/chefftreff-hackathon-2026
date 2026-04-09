@@ -155,9 +155,9 @@ export function WaterGlassRating({
           );
         })}
       </div>
-      <p className="text-xs leading-5 text-muted-foreground">
+      {/*<p className="text-xs leading-5 text-muted-foreground">
         Tap a glass to fill that amount and all previous glasses.
-      </p>
+      </p>*/}
     </div>
   );
 }
@@ -205,9 +205,9 @@ export function ServingRating({
           );
         })}
       </div>
-      <p className="text-xs leading-5 text-muted-foreground">
+     {/* <p className="text-xs leading-5 text-muted-foreground">
         Tap a serving to fill that amount and all previous servings.
-      </p>
+      </p>*/}
     </div>
   );
 }

@@ -305,9 +305,9 @@ export default function DailyCheckInPage() {
                 />
               </div>
               <div className="rounded-3xl bg-[var(--checkin-warm-surface)] p-5">
-                <p className="text-xs font-medium tracking-[0.18em] text-[var(--checkin-warm-text)] uppercase">
+                {/*<p className="text-xs font-medium tracking-[0.18em] text-[var(--checkin-warm-text)] uppercase">
                   Survey mapping
-                </p>
+                </p>*/}
                 <p className="mt-2.5 text-3xl font-semibold tracking-[-0.06em] text-foreground">
                   {fruitVeg || "0"}
                 </p>
@@ -444,9 +444,9 @@ export default function DailyCheckInPage() {
                   />
                 </div>
                 <div className="rounded-3xl bg-[var(--checkin-brand)] p-5 text-white">
-                  <p className="text-xs tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
+                  {/*<p className="text-xs tracking-[0.18em] text-[var(--checkin-white-text-faint)] uppercase">
                     Logged now
-                  </p>
+                  </p>*/}
                   <p className="mt-2.5 text-3xl font-semibold tracking-[-0.06em]">
                     {waterGlasses || "0"}
                   </p>
