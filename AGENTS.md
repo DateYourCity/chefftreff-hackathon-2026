@@ -10,6 +10,8 @@ We are building a health companion app in Next.js for a hackathon.
 
 This project is intentionally Wizard-of-Oz first. Favor polished demos, believable flows, and strong UX over real backend or production-grade implementation.
 
+Use Tailwind CSS and shadcn/ui as the default styling and component approach for the app.
+
 The app should feel great as a mobile app. Design and build the UI primarily for a phone-sized viewport.
 
 The root HTML layout should include a visible main device border with a fixed size that matches the iPhone 17 Pro frame used by the project.
