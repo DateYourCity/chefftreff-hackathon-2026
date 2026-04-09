@@ -16,6 +16,7 @@ import {
   CheckInChoiceChips,
   CheckInSectionCard,
   CheckInSurfaceCard,
+  WaterGlassRating,
 } from "@/components/check-in/check-in-ui";
 import { checkInTheme, checkInThemeVars } from "@/components/check-in/theme";
 import { Badge } from "@/components/ui/badge";
@@ -436,15 +437,12 @@ export default function DailyCheckInPage() {
             <CardContent className="space-y-5 px-6 pb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2.5">
-                  <Label htmlFor="water" className="text-sm font-semibold">
+                  <Label className="text-sm font-semibold">
                     Water glasses
                   </Label>
-                  <Input
-                    id="water"
-                    inputMode="numeric"
-                    value={waterGlasses}
-                    onChange={(event) => setWaterGlasses(event.target.value)}
-                    className="bg-white"
+                  <WaterGlassRating
+                    value={Number(waterGlasses) || 0}
+                    onChange={(next) => setWaterGlasses(String(next))}
                   />
                 </div>
                 <div className="rounded-3xl bg-[var(--checkin-brand)] p-5 text-white">
@@ -460,9 +458,14 @@ export default function DailyCheckInPage() {
                 </div>
               </div>
 
-              <Separator />
+              {/*<Separator />*/}
 
-              <div className="space-y-2.5">
+            </CardContent>
+
+            
+          </CheckInSurfaceCard>
+
+          <div className="space-y-2.5">
                 <Label htmlFor="reflection" className="text-sm font-semibold">
                   Anything affecting your routine today?
                 </Label>
@@ -474,12 +477,10 @@ export default function DailyCheckInPage() {
                   placeholder="Travel day, overtime, poor sleep, social plans, or anything else worth noting."
                 />
               </div>
-            </CardContent>
-          </CheckInSurfaceCard>
         </div>
 
         <div className="mt-6 rounded-[2rem] border border-[var(--checkin-border)] bg-[var(--checkin-card)] p-5 shadow-lg shadow-[var(--checkin-shadow)] backdrop-blur-sm">
-          <div className="flex items-start gap-3.5">
+          {/*<div className="flex items-start gap-3.5">
             <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[var(--checkin-brand)] text-white">
               <Check className="size-4" />
             </div>
@@ -493,9 +494,15 @@ export default function DailyCheckInPage() {
                 into structured records.
               </p>
             </div>
-          </div>
+          </div>*/}
 
-          <div className="mt-5 flex gap-3">
+          <div className=" flex gap-3">
+            <Button
+              variant="outline"
+              className="h-12 rounded-2xl border-[var(--checkin-border-strong)] bg-white px-5"
+            >
+              Preview data
+            </Button>
             <Button
               className={cn(
                 "h-12 flex-1 rounded-2xl",
@@ -504,12 +511,7 @@ export default function DailyCheckInPage() {
             >
               Save check-in
             </Button>
-            <Button
-              variant="outline"
-              className="h-12 rounded-2xl border-[var(--checkin-border-strong)] bg-white px-5"
-            >
-              Preview data
-            </Button>
+            
           </div>
         </div>
       </section>

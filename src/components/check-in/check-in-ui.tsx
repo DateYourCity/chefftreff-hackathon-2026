@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
+import { GlassWater } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -108,5 +109,55 @@ export function CheckInSurfaceCard({
     <Card className={cn("overflow-hidden", checkInTheme.card, className)}>
       {children}
     </Card>
+  );
+}
+
+export function WaterGlassRating({
+  value,
+  max = 8,
+  onChange,
+}: {
+  value: number;
+  max?: number;
+  onChange: (next: number) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-4 gap-2.5">
+        {Array.from({ length: max }, (_, index) => {
+          const glassValue = index + 1;
+          const selected = glassValue <= value;
+
+          return (
+            <button
+              key={glassValue}
+              type="button"
+              onClick={() => onChange(glassValue)}
+              className={cn(
+                "group flex flex-col items-center gap-2 rounded-3xl border px-3 py-3 transition-all",
+                selected
+                  ? "border-[var(--checkin-brand)] bg-[var(--checkin-brand-soft)] text-[var(--checkin-brand)] shadow-md shadow-[var(--checkin-shadow)]"
+                  : "border-border/70 bg-white text-muted-foreground hover:border-[var(--checkin-brand)]/35 hover:bg-[var(--checkin-brand-mint)] hover:text-[var(--checkin-brand)]"
+              )}
+              aria-label={`Set water intake to ${glassValue} glasses`}
+              aria-pressed={selected}
+            >
+              <GlassWater
+                className={cn(
+                  "size-6 transition-all",
+                  selected
+                    ? "fill-[var(--checkin-brand)] text-[var(--checkin-brand)]"
+                    : "fill-transparent text-current"
+                )}
+              />
+              <span className="text-xs font-medium">{glassValue}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs leading-5 text-muted-foreground">
+        Tap a glass to fill that amount and all previous glasses.
+      </p>
+    </div>
   );
 }
