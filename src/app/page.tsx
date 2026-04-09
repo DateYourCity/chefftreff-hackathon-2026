@@ -6,16 +6,6 @@ const INFO_ITEMS = [
         description:
             "A mobile-first prototype for the Chefftreff hackathon focused on making patient context easy to scan.",
     },
-    {
-        title: "Simple data overview",
-        description:
-            "Shows the essentials from EHR, lifestyle survey, and wearable telemetry data in one place.",
-    },
-    {
-        title: "Wizard-of-Oz first",
-        description:
-            "Optimized for believable demos and quick decision support, not production workflows.",
-    },
 ]
 
 export default function Home() {

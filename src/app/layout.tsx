@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     title: "BetterYou",
     description:
         "BetterYou is a mobile-first health companion demo for the Chefftreff hackathon, designed to make personal health context easy to understand at a glance.",
+    icons: {
+        icon: "/logo.png",
+        shortcut: "/logo.png",
+        apple: "/logo.png",
+    },
 };
 
 export const viewport: Viewport = {

@@ -10,26 +10,8 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 import Link from "next/link"
-
-// Simple logo component for the navbar
-const Logo = (props: React.SVGProps<SVGSVGElement>) => {
-    return (
-        <svg
-            aria-label="Logo"
-            role="img"
-            fill="none"
-            height="1em"
-            viewBox="0 0 324 323"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-            {...props}
-        >
-            <rect fill="currentColor" height="323" rx="161.5" width="323" x="0.5" />
-            <circle cx="162" cy="161.5" fill="white" r="60" />
-        </svg>
-    )
-}
 
 // Hamburger icon component
 const HamburgerIcon = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
@@ -175,7 +157,15 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                                 href="/"
                                 className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors"
                             >
-                                <span className="hidden font-bold text-xl sm:inline-block">BCG Demo</span>
+                                <Image
+                                    src="/logo.png"
+                                    alt="BetterYou logo"
+                                    width={32}
+                                    height={32}
+                                    className="rounded-md"
+                                    priority
+                                />
+                                <span className="font-bold text-xl">BetterYou</span>
                             </Link>
                             {/* Navigation menu */}
                             {!isMobile && (
@@ -209,4 +199,4 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
 Navbar.displayName = "Navbar"
 
-export { Logo, HamburgerIcon }
+export { HamburgerIcon }
