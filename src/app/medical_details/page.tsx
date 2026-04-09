@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { getHealthDocs } from "@/lib/health-docs";
 import {
     CalendarDays,
     ChevronRight,
@@ -7,7 +7,7 @@ import {
     Sparkles,
     Stethoscope,
 } from "lucide-react";
-import { getHealthDocs } from "@/lib/health-docs";
+import Link from "next/link";
 
 const visitHistory = [
     {
@@ -126,17 +126,6 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
             <div className="mt-4 rounded-[26px] border border-white/70 bg-white/85 p-1.5 shadow-[0_14px_32px_rgba(15,23,42,0.07)]">
                 <div className="grid grid-cols-2 gap-1">
                     <Link
-                        href="/medical_details"
-                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
-                            activeTab === "documents"
-                                ? "bg-primary text-white"
-                                : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
-                        }`}
-                    >
-                        <FileText className="h-4 w-4 shrink-0" />
-                        Documents
-                    </Link>
-                    <Link
                         href="/medical_details?tab=visits"
                         className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${
                             activeTab === "visits"
@@ -155,6 +144,16 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                         >
                             {futureAppointmentProposals.length}
                         </span>
+                    </Link>
+                    <Link
+                        href="/medical_details"
+                        className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${activeTab === "documents"
+                                ? "bg-primary text-white"
+                                : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+                            }`}
+                    >
+                        <FileText className="h-4 w-4 shrink-0" />
+                        Documents
                     </Link>
                 </div>
             </div>
