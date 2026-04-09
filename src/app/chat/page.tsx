@@ -1,6 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  CHAT_CONTEXT_STORAGE_KEY,
+  type CoachChatContext,
+  type MedicalDocumentChatContext,
+  type ShopRecommendation,
+  type SubmittedCheckIn,
+} from "@/lib/chat-context";
 import { cn } from "@/lib/utils";
 import { Database, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
@@ -18,43 +25,6 @@ type AttachedFile = {
   file: File;
 };
 
-type Recommendation = {
-  title: string;
-  detail: string;
-  reason: string;
-};
-
-type SubmittedCheckIn = {
-  dietQuality: string;
-  mealRhythm: string;
-  fruitVeg: string;
-  waterGlasses: string;
-  movementType: string;
-  movementMinutes: string;
-  movementBreaks: string;
-  stressLevel: string;
-  sleepSatisfaction: string;
-  energyLevel: string;
-  reflection: string;
-};
-
-type DailyCheckInChatContext = {
-  submittedCheckIn: SubmittedCheckIn;
-  recommendations: Recommendation[];
-  intro: string;
-  summaryTitle: string;
-  summaryTheme: string;
-};
-
-type ShopRecommendation = {
-  title: string;
-  detail: string;
-  href: string;
-  linkLabel: string;
-};
-
-const STORAGE_KEY = "daily-checkin-chat-context";
-
 const INITIAL_MESSAGES: Message[] = [
   {
     id: "m-1",
@@ -64,7 +34,7 @@ const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-function getCoachReply(question: string, data: SubmittedCheckIn) {
+function getDailyCheckInReply(question: string, data: SubmittedCheckIn) {
   const normalized = question.toLowerCase();
   const stress = Number(data.stressLevel);
   const water = Number(data.waterGlasses);
@@ -116,7 +86,9 @@ function getCoachReply(question: string, data: SubmittedCheckIn) {
   return "The check-in suggests a mostly stable day with a few manageable issues. A simple, consistent plan for tomorrow is the best next step.";
 }
 
-function getShopRecommendations(data: SubmittedCheckIn): ShopRecommendation[] {
+function getDailyCheckInShopRecommendations(
+  data: SubmittedCheckIn
+): ShopRecommendation[] {
   const stress = Number(data.stressLevel);
   const water = Number(data.waterGlasses);
   const sleepIsLow =
@@ -145,6 +117,91 @@ function getShopRecommendations(data: SubmittedCheckIn): ShopRecommendation[] {
   }
 
   return recommendations;
+}
+
+function getMedicalDocumentReply(
+  question: string,
+  context: MedicalDocumentChatContext
+) {
+  const normalized = question.toLowerCase();
+  const documentLabel = context.document.label;
+
+  if (
+    normalized.includes("summary") ||
+    normalized.includes("overview") ||
+    normalized.includes("main")
+  ) {
+    return `${context.document.summary} The best first step is to review ${context.document.focusAreas[0]?.toLowerCase() ?? "the key findings"}.`;
+  }
+
+  if (
+    normalized.includes("flag") ||
+    normalized.includes("abnormal") ||
+    normalized.includes("result")
+  ) {
+    return `For ${documentLabel}, start with any flagged or borderline items and then compare related values together. That gives a clearer picture than looking at isolated numbers.`;
+  }
+
+  if (
+    normalized.includes("question") ||
+    normalized.includes("ask") ||
+    normalized.includes("doctor") ||
+    normalized.includes("clinic")
+  ) {
+    return `A useful follow-up question is: "${context.document.recommendedQuestions[0]}". You could also ask about timing for repeat testing or the next review visit.`;
+  }
+
+  if (
+    normalized.includes("supplement") ||
+    normalized.includes("vitamin") ||
+    normalized.includes("iron")
+  ) {
+    if (context.document.shopRecommendations.length === 0) {
+      return "This report does not point to a specific supplement suggestion in the demo context. It would be better to confirm the clinical goal first.";
+    }
+
+    return `Possible supplement options are listed above, but they should be matched to confirmed findings and reviewed with a clinician before use.`;
+  }
+
+  if (
+    normalized.includes("follow") ||
+    normalized.includes("next step") ||
+    normalized.includes("repeat")
+  ) {
+    return context.document.clinicFollowUp;
+  }
+
+  return `I can help explain ${documentLabel}, review the likely focus areas, or help you prepare questions for your next clinic visit.`;
+}
+
+function getCoachReply(question: string, context: CoachChatContext) {
+  if (context.kind === "daily-checkin") {
+    return getDailyCheckInReply(question, context.submittedCheckIn);
+  }
+
+  return getMedicalDocumentReply(question, context);
+}
+
+function getContextPrompts(context: CoachChatContext) {
+  if (context.kind === "daily-checkin") {
+    return [
+      "Why is hydration important?",
+      "What should I prioritize tomorrow?",
+      "Which activity would help most?",
+    ];
+  }
+
+  return [
+    "What should I review first?",
+    "What should I ask at follow-up?",
+    "Do any supplements make sense here?",
+  ];
+}
+
+function getContextPlaceholder(context: CoachChatContext) {
+  return context.kind === "daily-checkin"
+    ? "Ask about the recommendations or next steps"
+    : "Ask about this document or the next clinical steps";
 }
 
 type ChatApiResponse = {
@@ -205,7 +262,7 @@ export default function ChatPage() {
   const [text, setText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
-  const [context, setContext] = useState<DailyCheckInChatContext | null>(null);
+  const [context, setContext] = useState<CoachChatContext | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -216,25 +273,25 @@ export default function ChatPage() {
       return;
     }
 
-    const raw = window.sessionStorage.getItem(STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(CHAT_CONTEXT_STORAGE_KEY);
 
     if (!raw) {
       return;
     }
 
     try {
-      const parsed = JSON.parse(raw) as DailyCheckInChatContext;
+      const parsed = JSON.parse(raw) as CoachChatContext;
       setContext(parsed);
       setMessages([
         {
-          id: "checkin-intro",
+          id: `${parsed.kind}-intro`,
           role: "assistant",
           content: parsed.intro,
         },
       ]);
-      window.sessionStorage.removeItem(STORAGE_KEY);
+      window.sessionStorage.removeItem(CHAT_CONTEXT_STORAGE_KEY);
     } catch (error) {
-      console.error("Failed to parse daily check-in chat context", error);
+      console.error("Failed to parse coach chat context", error);
     }
   }, []);
 
@@ -301,7 +358,7 @@ export default function ChatPage() {
         const assistantMessage: Message = {
           id: `a-${Date.now()}`,
           role: "assistant",
-          content: getCoachReply(trimmed, context.submittedCheckIn),
+          content: getCoachReply(trimmed, context),
         };
 
         setMessages((current) => [...current, assistantMessage]);
@@ -351,9 +408,12 @@ export default function ChatPage() {
     }
   };
 
-  const shopRecommendations = context
-    ? getShopRecommendations(context.submittedCheckIn)
-    : [];
+  const shopRecommendations =
+    context?.kind === "daily-checkin"
+      ? getDailyCheckInShopRecommendations(context.submittedCheckIn)
+      : context?.kind === "medical-document"
+        ? context.document.shopRecommendations
+        : [];
 
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-[radial-gradient(circle_at_top,#fbfcfe_0%,#f1f5fa_50%,#eaf0f7_100%)]">
@@ -375,7 +435,9 @@ export default function ChatPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Check-in context
+                  {context.kind === "daily-checkin"
+                    ? "Check-in context"
+                    : "Document context"}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold text-slate-900">
                   {context.summaryTitle}
@@ -387,7 +449,10 @@ export default function ChatPage() {
             </div>
 
             <div className="grid gap-3">
-              {context.recommendations.map((item) => (
+              {(context.kind === "daily-checkin"
+                ? context.recommendations
+                : context.document.recommendations
+              ).map((item) => (
                 <div
                   key={item.title}
                   className="rounded-2xl border border-slate-200 bg-slate-50/90 p-3"
@@ -401,6 +466,30 @@ export default function ChatPage() {
                 </div>
               ))}
             </div>
+
+            {context.kind === "medical-document" && (
+              <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {context.document.label}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {context.document.summary}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {context.document.focusAreas.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {shopRecommendations.length > 0 && (
               <div className="space-y-3 border-t border-slate-200 pt-4">
@@ -444,8 +533,9 @@ export default function ChatPage() {
                 Follow-up clinic visit
               </p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Consider a follow-up visit for more current data such as blood
-                pressure, weight, medication review, and any relevant lab work.
+                {context.kind === "daily-checkin"
+                  ? "Consider a follow-up visit for more current data such as blood pressure, weight, medication review, and any relevant lab work."
+                  : context.document.clinicFollowUp}
               </p>
             </div>
           </div>
@@ -457,11 +547,7 @@ export default function ChatPage() {
 
         {context && (
           <div className="flex flex-wrap gap-2">
-            {[
-              "Why is hydration important?",
-              "What should I prioritize tomorrow?",
-              "Which activity would help most?",
-            ].map((prompt) => (
+            {getContextPrompts(context).map((prompt) => (
               <button
                 key={prompt}
                 type="button"
@@ -542,9 +628,7 @@ export default function ChatPage() {
               }}
               rows={1}
               placeholder={
-                context
-                  ? "Ask about the recommendations or next steps"
-                  : "Message Health Copilot"
+                context ? getContextPlaceholder(context) : "Message Health Copilot"
               }
               className="max-h-36 min-h-10 flex-1 resize-none bg-transparent px-3 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400"
             />

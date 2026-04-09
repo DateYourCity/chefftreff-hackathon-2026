@@ -29,6 +29,12 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import {
+  buildDailyCheckInChatContext,
+  type Recommendation,
+  type SubmittedCheckIn,
+  saveCoachChatContext,
+} from "@/lib/chat-context";
 import { cn } from "@/lib/utils";
 
 const habitOptions = {
@@ -51,26 +57,6 @@ const habitOptions = {
   sleep: ["Poor", "Fair", "Good", "Restorative"],
   energy: ["Drained", "Low", "Steady", "Good", "High"],
 } as const;
-
-type SubmittedCheckIn = {
-  dietQuality: string;
-  mealRhythm: string;
-  fruitVeg: string;
-  waterGlasses: string;
-  movementType: string;
-  movementMinutes: string;
-  movementBreaks: string;
-  stressLevel: string;
-  sleepSatisfaction: string;
-  energyLevel: string;
-  reflection: string;
-};
-
-type Recommendation = {
-  title: string;
-  detail: string;
-  reason: string;
-};
 
 function buildRecommendations(data: SubmittedCheckIn): Recommendation[] {
   const recommendations: Recommendation[] = [];
@@ -279,18 +265,15 @@ export default function DailyCheckInPage() {
       return;
     }
 
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(
-        "daily-checkin-chat-context",
-        JSON.stringify({
-          submittedCheckIn,
-          recommendations: submittedRecommendations,
-          intro: buildCoachIntro(submittedCheckIn, submittedRecommendations),
-          summaryTitle: "Stable overall",
-          summaryTheme: "Mild recovery strain",
-        })
-      );
-    }
+    saveCoachChatContext(
+      buildDailyCheckInChatContext({
+        submittedCheckIn,
+        recommendations: submittedRecommendations,
+        intro: buildCoachIntro(submittedCheckIn, submittedRecommendations),
+        summaryTitle: "Stable overall",
+        summaryTheme: "Mild recovery strain",
+      })
+    );
 
     router.push("/chat");
   };
