@@ -10,7 +10,7 @@ const vitalBubbles = [
         source: "EHR",
         tone: "from-rose-500 to-red-600",
         textTone: "text-rose-50",
-        position: "left-1 top-16",
+        position: "left-1 top-12",
     },
     {
         id: "sleep",
@@ -19,7 +19,7 @@ const vitalBubbles = [
         source: "Apple Watch",
         tone: "from-rose-500 to-red-600",
         textTone: "text-rose-50",
-        position: "right-1 top-16",
+        position: "right-1 top-12",
     },
     {
         id: "heart-rate",
@@ -28,7 +28,7 @@ const vitalBubbles = [
         source: "Apple Watch",
         tone: "from-emerald-400 to-green-500",
         textTone: "text-emerald-950",
-        position: "left-3 bottom-24",
+        position: "left-3 bottom-14",
     },
     {
         id: "stress-level",
@@ -37,7 +37,7 @@ const vitalBubbles = [
         source: "Checkin",
         tone: "from-slate-400 to-zinc-500",
         textTone: "text-slate-950",
-        position: "right-3 bottom-24",
+        position: "right-3 bottom-14",
     },
 
 ] as const;
@@ -67,7 +67,7 @@ export default function HomePage() {
             <div className="relative mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden rounded-[32px] border border-slate-200/80 bg-white px-5 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
                 <div className="pointer-events-none absolute inset-x-4 top-0 h-28 rounded-full" />
 
-                <div className="relative z-10">
+                <div style={{zIndex: 999}} className="relative z-10">
                     <div className="mx-auto flex w-full max-w-[220px] flex-col items-center rounded-[26px] border border-slate-200 bg-slate-50 px-4 py-3 text-center shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
                             Biological Age
@@ -78,7 +78,7 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                <div className="relative z-10 flex-1">
+                <div style={{marginTop: "-30px"}} className="relative z-10 flex-1">
                     <div className="relative mx-auto flex h-full min-h-[520px] w-full max-w-[320px] items-center justify-center">
 
                         <div className="relative flex h-[420px] w-[260px] items-center justify-center">
