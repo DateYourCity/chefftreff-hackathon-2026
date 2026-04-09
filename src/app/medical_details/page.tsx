@@ -152,9 +152,6 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     <h3 className="mt-1 text-lg font-semibold text-foreground">
                                         Next appointments
                                     </h3>
-                                    <p className="mt-1 text-sm text-muted-foreground">
-                                        Tap an appointment to open the detailed visit view.
-                                    </p>
                                 </div>
                                 <span className="inline-flex rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">
                                     {upcomingVisits.length}
@@ -190,11 +187,7 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                                 </div>
                                                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                                                     {visit.summary}
-                                                </p>
-                                                <div className="mt-4 flex items-center justify-between rounded-full bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors group-hover:bg-emerald-100">
-                                                    <span>View details</span>
-                                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                                                </div>
+                                                    </p>
                                             </div>
                                         </div>
                                     </article>
@@ -212,9 +205,6 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     <h3 className="mt-1 text-lg font-semibold text-foreground">
                                         Previous appointments
                                     </h3>
-                                    <p className="mt-1 text-sm text-muted-foreground">
-                                        Tap any appointment to review the visit record.
-                                    </p>
                                 </div>
                                 <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
                                     {pastVisits.length}

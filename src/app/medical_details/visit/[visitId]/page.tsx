@@ -96,9 +96,6 @@ export default async function VisitDetailPage(
                     <p className="mt-3 text-sm leading-6 text-muted-foreground">
                         {visit.summary}
                     </p>
-                    <div className="mt-4 rounded-[20px] bg-muted/40 px-4 py-3 text-sm leading-6 text-muted-foreground">
-                        Tap back to return to the full appointment list, or use this summary to prepare your follow-up.
-                    </div>
                 </div>
 
                 <div className="rounded-[26px] border border-emerald-200/80 bg-[linear-gradient(180deg,rgba(236,248,241,0.96),rgba(255,255,255,0.98))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.05)]">

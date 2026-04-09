@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronRight, MapPin, Stethoscope } from "lucide-react";
+import { CalendarDays, MapPin, Stethoscope } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -46,10 +46,6 @@ export function PastVisitsList({ visits }: PastVisitsListProps) {
                                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                                     {visit.summary}
                                 </p>
-                                <div className="mt-4 flex items-center justify-between rounded-full bg-muted/40 px-3 py-2 text-sm font-semibold text-foreground transition-colors group-hover:bg-muted/60">
-                                    <span>View details</span>
-                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                                </div>
                             </div>
                         </div>
                     </article>
