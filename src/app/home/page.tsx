@@ -3,6 +3,7 @@
 import userData from "@/app/chat/user_data.json";
 import SimpleDAEViewer from "@/components/three-avatar";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type CompactTable = {
@@ -353,6 +354,13 @@ export default function HomePage() {
                             <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${toneStyles[healthInsights.recoveryTone].badge}`}>
                                 {toneStyles[healthInsights.recoveryTone].label}
                             </div>
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="mt-4 w-full border-emerald-300/80 bg-white/70 text-emerald-950 hover:bg-emerald-100/80"
+                            >
+                                <Link href="/daily_checkin">Go to daily check-in</Link>
+                            </Button>
                         </div>
 
                         <div className="grid grid-cols-1 gap-3">
