@@ -11,7 +11,26 @@ import Link from "next/link";
 
 const visitHistory = [
     {
+        id: "visit-11",
+        status: "upcoming",
+        date: "22 Apr 2026",
+        doctor: "Dr. Anna Keller",
+        specialty: "General Practice",
+        location: "Munich City Center",
+        summary: "Annual check-up and blood pressure review.",
+    },
+    {
+        id: "visit-12",
+        status: "upcoming",
+        date: "06 May 2026",
+        doctor: "Dr. Mehmet Yilmaz",
+        specialty: "Cardiology",
+        location: "Schwabing",
+        summary: "Repeat ECG follow-up to confirm palpitations have settled.",
+    },
+    {
         id: "visit-01",
+        status: "past",
         date: "08 Apr 2026",
         doctor: "Dr. Anna Keller",
         specialty: "General Practice",
@@ -20,6 +39,7 @@ const visitHistory = [
     },
     {
         id: "visit-02",
+        status: "past",
         date: "14 Feb 2026",
         doctor: "Dr. Mehmet Yilmaz",
         specialty: "Cardiology",
@@ -28,6 +48,7 @@ const visitHistory = [
     },
     {
         id: "visit-03",
+        status: "past",
         date: "03 Dec 2025",
         doctor: "Dr. Sophie Brandt",
         specialty: "Dermatology",
@@ -36,6 +57,7 @@ const visitHistory = [
     },
     {
         id: "visit-04",
+        status: "past",
         date: "21 Oct 2025",
         doctor: "Dr. Lukas Werner",
         specialty: "Orthopedics",
@@ -44,6 +66,7 @@ const visitHistory = [
     },
     {
         id: "visit-05",
+        status: "past",
         date: "12 Aug 2025",
         doctor: "Dr. Clara Neumann",
         specialty: "Gynecology",
@@ -52,6 +75,7 @@ const visitHistory = [
     },
     {
         id: "visit-06",
+        status: "past",
         date: "25 Jun 2025",
         doctor: "Dr. Jonas Beck",
         specialty: "ENT",
@@ -60,6 +84,7 @@ const visitHistory = [
     },
     {
         id: "visit-07",
+        status: "past",
         date: "09 Apr 2025",
         doctor: "Dr. Eva Schmitt",
         specialty: "Neurology",
@@ -68,6 +93,7 @@ const visitHistory = [
     },
     {
         id: "visit-08",
+        status: "past",
         date: "17 Jan 2025",
         doctor: "Dr. David Roth",
         specialty: "Gastroenterology",
@@ -76,6 +102,7 @@ const visitHistory = [
     },
     {
         id: "visit-09",
+        status: "past",
         date: "04 Nov 2024",
         doctor: "Dr. Miriam Vogel",
         specialty: "Ophthalmology",
@@ -84,6 +111,7 @@ const visitHistory = [
     },
     {
         id: "visit-10",
+        status: "past",
         date: "28 Aug 2024",
         doctor: "Dr. Felix Braun",
         specialty: "Endocrinology",
@@ -108,6 +136,8 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
     const docs = await getHealthDocs();
     const searchParams = await props.searchParams;
     const activeTab = searchParams.tab === "visits" ? "visits" : "documents";
+    const upcomingVisits = visitHistory.filter((visit) => visit.status === "upcoming");
+    const pastVisits = visitHistory.filter((visit) => visit.status === "past");
 
     return (
         <section className="min-h-full bg-[linear-gradient(180deg,#f8f5eb_0%,#f4f6fb_52%,#eef3f8_100%)] px-4 py-5">
@@ -142,7 +172,7 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     : "bg-primary text-white"
                             }`}
                         >
-                            {futureAppointmentProposals.length}
+                            {upcomingVisits.length}
                         </span>
                     </Link>
                     <Link
@@ -224,37 +254,105 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                         </div>
                     </div>
 
-                    {visitHistory.map((visit) => (
-                        <article
-                            key={visit.id}
-                            className="rounded-[24px] border border-border/70 bg-white px-4 py-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]"
-                        >
-                            <div className="flex items-start gap-3">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
-                                    <Stethoscope className="h-5 w-5" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <CalendarDays className="h-4 w-4" />
-                                        <span>{visit.date}</span>
-                                    </div>
-                                    <h2 className="mt-2 text-base font-semibold text-foreground">
-                                        {visit.doctor}
-                                    </h2>
-                                    <p className="text-sm font-medium text-primary">
-                                        {visit.specialty}
+                        <section className="rounded-[26px] border border-emerald-200/80 bg-[linear-gradient(180deg,rgba(236,248,241,0.96),rgba(255,255,255,0.98))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.05)]">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                                        Upcoming visits
                                     </p>
-                                    <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                                        <MapPin className="h-4 w-4" />
-                                        <span>{visit.location}</span>
-                                    </div>
-                                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                                        {visit.summary}
-                                    </p>
+                                    <h3 className="mt-1 text-lg font-semibold text-foreground">
+                                        Next appointments
+                                    </h3>
                                 </div>
+                                <span className="inline-flex rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">
+                                    {upcomingVisits.length}
+                                </span>
                             </div>
-                        </article>
-                    ))}
+
+                            <div className="mt-4 space-y-3">
+                                {upcomingVisits.map((visit) => (
+                                    <article
+                                        key={visit.id}
+                                        className="rounded-[22px] border border-emerald-200 bg-white px-4 py-4"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                                                <CalendarDays className="h-5 w-5" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2 text-sm text-emerald-700">
+                                                    <CalendarDays className="h-4 w-4" />
+                                                    <span>{visit.date}</span>
+                                                </div>
+                                                <h2 className="mt-2 text-base font-semibold text-foreground">
+                                                    {visit.doctor}
+                                                </h2>
+                                                <p className="text-sm font-medium text-primary">
+                                                    {visit.specialty}
+                                                </p>
+                                                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <MapPin className="h-4 w-4" />
+                                                    <span>{visit.location}</span>
+                                                </div>
+                                                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                                                    {visit.summary}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="rounded-[26px] border border-border/70 bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                                        Past visits
+                                    </p>
+                                    <h3 className="mt-1 text-lg font-semibold text-foreground">
+                                        Previous appointments
+                                    </h3>
+                                </div>
+                                <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+                                    {pastVisits.length}
+                                </span>
+                            </div>
+
+                            <div className="mt-4 space-y-3">
+                                {pastVisits.map((visit) => (
+                                    <article
+                                        key={visit.id}
+                                    className="rounded-[22px] border border-border/70 bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+                                            <Stethoscope className="h-5 w-5" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <CalendarDays className="h-4 w-4" />
+                                                <span>{visit.date}</span>
+                                            </div>
+                                            <h2 className="mt-2 text-base font-semibold text-foreground">
+                                                {visit.doctor}
+                                            </h2>
+                                            <p className="text-sm font-medium text-primary">
+                                                {visit.specialty}
+                                            </p>
+                                            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                                                <MapPin className="h-4 w-4" />
+                                                <span>{visit.location}</span>
+                                            </div>
+                                            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                                                {visit.summary}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                            </div>
+                        </section>
                 </div>
             )}
         </section>
