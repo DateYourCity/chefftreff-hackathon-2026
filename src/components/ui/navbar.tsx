@@ -122,6 +122,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
         return (
             <header
+                style={{width: "calc(100% + 10px)"}}
                 className={cn(
                     "sticky top-0 z-50 w-full border-b bg-background px-4 md:px-6",
                     className,
