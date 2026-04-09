@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator"
 
 const INFO_ITEMS = [
     {
-        title: "Better U",
+        title: "BetterYou",
         description:
             "A mobile-first prototype for the Chefftreff hackathon focused on making patient context easy to scan.",
     },
@@ -24,7 +24,7 @@ export default function Home() {
             <section className="w-full max-w-2xl space-y-8 rounded-3xl border bg-card p-4 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
                 <div className="space-y-4 text-center">
                     <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-                        Better U
+                        BetterYou
                     </h1>
                     <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
                         A lightweight landing page for the project. It keeps the focus on the demo, the data sources, and the intended mobile experience.
