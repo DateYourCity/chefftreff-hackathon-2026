@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { getHealthDocs } from "@/lib/health-docs";
 import {
     CalendarDays,
@@ -214,14 +215,14 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                 </div>
             ) : (
                 <div className="mt-4 space-y-3">
-                    <div className="rounded-[26px] border border-primary/15 bg-[linear-gradient(135deg,rgba(70,120,96,0.10),rgba(255,255,255,0.94))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
-                        <div className="flex items-center gap-2 text-primary">
+                        <div className="rounded-[26px] border border-rose-200/80 bg-[linear-gradient(135deg,rgba(255,228,228,0.95),rgba(255,255,255,0.97))] p-4 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+                            <div className="flex items-center gap-2 text-rose-700">
                             <Sparkles className="h-4 w-4" />
                             <p className="text-xs font-semibold uppercase tracking-[0.2em]">
                                 Proposed Next Appointments
                             </p>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                            <p className="mt-2 text-sm leading-6 text-rose-900/70">
                             Based on your recent visits, these follow-ups would make sense to schedule next.
                         </p>
 
@@ -229,14 +230,14 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                             {futureAppointmentProposals.map((proposal) => (
                                 <article
                                     key={proposal.id}
-                                    className="rounded-[22px] border border-primary/15 bg-[linear-gradient(180deg,rgba(229,242,235,0.96),rgba(243,249,245,0.98))] px-4 py-4"
+                                    className="rounded-[22px] border border-rose-200 bg-[linear-gradient(180deg,rgba(255,244,244,0.98),rgba(255,255,255,0.99))] px-4 py-4"
                                 >
                                     <div className="flex items-start gap-3">
-                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
                                             <CalendarDays className="h-5 w-5" />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium text-primary">
+                                            <p className="text-sm font-medium text-rose-700">
                                                 {proposal.timeframe}
                                             </p>
                                             <h2 className="mt-1 text-base font-semibold text-foreground">
@@ -248,6 +249,13 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                             <p className="mt-2 text-sm leading-6 text-muted-foreground">
                                                 {proposal.reason}
                                             </p>
+                                            <Button
+                                                asChild
+                                                size="sm"
+                                                className="mt-4 h-9 w-full rounded-full bg-rose-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-rose-700"
+                                            >
+                                                <Link href="/appointment">Book appointment</Link>
+                                            </Button>
                                         </div>
                                     </div>
                                 </article>
