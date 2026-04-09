@@ -11,8 +11,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-    title: "BCG Health Companion Demo",
-    description: "A mobile-first prototype for the Chefftreff hackathon focused on making patient context easy to scan.",
+    title: "Better U",
+    description:
+        "Better U is a mobile-first health companion demo for the Chefftreff hackathon, designed to make personal health context easy to understand at a glance.",
 };
 
 export const viewport: Viewport = {
