@@ -8,7 +8,7 @@ export interface HealthDocFile {
     file_name: string;
 }
 
-const healthDocsDirectory = path.join(process.cwd(), "public", "health_docs");
+const healthDocsDirectory = path.join(process.cwd(), "public", "medical_details");
 
 function formatDocumentLabel(fileName: string) {
     return fileName
@@ -25,7 +25,7 @@ export async function getHealthDocs(): Promise<HealthDocFile[]> {
     return entries
         .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".pdf"))
         .map((entry) => ({
-            href: `/health_docs/${encodeURIComponent(entry.name.replace(/\.pdf$/i, ""))}`,
+            href: `/medical_details/${encodeURIComponent(entry.name.replace(/\.pdf$/i, ""))}`,
             id: entry.name.replace(/\.pdf$/i, ""),
             label: formatDocumentLabel(entry.name),
             file_name: entry.name,

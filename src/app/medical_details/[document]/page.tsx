@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 }
 
 export default async function HealthDocViewerPage(
-    props: PageProps<"/health_docs/[document]">,
+    props: PageProps<"/medical_details/[document]">,
 ) {
     const params = await props.params;
     const docs = await getHealthDocs();
@@ -23,13 +23,13 @@ export default async function HealthDocViewerPage(
         notFound();
     }
 
-    const pdfUrl = `/health_docs/${encodeURIComponent(doc.file_name)}`;
+    const pdfUrl = `/medical_details/${encodeURIComponent(doc.file_name)}`;
 
     return (
         <section className="flex min-h-full flex-col bg-[linear-gradient(180deg,#f6f7fb_0%,#edf2f7_100%)]">
             <div className="border-b border-border/70 bg-white/90 px-4 py-3 backdrop-blur">
                 <Link
-                    href="/health_docs"
+                    href="/medical_details"
                     className="inline-flex items-center gap-2 text-sm font-semibold text-primary"
                 >
                     <ChevronLeft className="h-4 w-4" />
