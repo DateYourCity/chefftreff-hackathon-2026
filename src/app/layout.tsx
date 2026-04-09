@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { Navbar } from "@/components/ui/navbar";
+import { BottomNav, Navbar } from "@/components/ui/navbar";
 
 const manrope = Manrope({
     subsets: ["latin"],
@@ -47,7 +47,10 @@ export default function RootLayout({
                             <div className="device-notch" aria-hidden="true" />
                             <div className="device-screen">
                                 <Navbar />
-                                {children}
+                                <div className="flex-1 pb-[calc(env(safe-area-inset-bottom)+5.75rem)]">
+                                    {children}
+                                </div>
+                                <BottomNav />
                             </div>
                         </div>
                     </div>
