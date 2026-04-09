@@ -6,11 +6,10 @@ import {
   ArrowLeft,
   Brain,
   Dumbbell,
-  MessageCircle,
   MoonStar,
-  Send,
   Sparkles,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   CheckInChoiceChips,
@@ -71,12 +70,6 @@ type Recommendation = {
   title: string;
   detail: string;
   reason: string;
-};
-
-type ChatMessage = {
-  id: string;
-  role: "assistant" | "user";
-  content: string;
 };
 
 function buildRecommendations(data: SubmittedCheckIn): Recommendation[] {
@@ -170,64 +163,9 @@ function buildCoachIntro(data: SubmittedCheckIn, recommendations: Recommendation
   ].join(" ");
 }
 
-function getCoachReply(question: string, data: SubmittedCheckIn) {
-  const normalized = question.toLowerCase();
-  const stress = Number(data.stressLevel);
-  const water = Number(data.waterGlasses);
-  const fruitVeg = Number(data.fruitVeg);
-
-  if (normalized.includes("why") && normalized.includes("hydr")) {
-    return `Hydration stood out because you logged ${water} glasses. This may contribute to lower energy and focus later in the day.`;
-  }
-
-  if (normalized.includes("what should i eat") || normalized.includes("meal")) {
-    return "A simple lunch with protein, fiber, and one fruit or vegetable would be a good next step.";
-  }
-
-  if (normalized.includes("exercise") || normalized.includes("movement") || normalized.includes("workout")) {
-    return `Based on today’s activity, a short walk or light mobility session would likely be more helpful than a harder workout.`;
-  }
-
-  if (normalized.includes("stress") || normalized.includes("sleep") || normalized.includes("energy")) {
-    return `Stress, sleep, and energy are closely linked in this check-in. These appear to be the main drivers of how the day felt overall.`;
-  }
-
-  if (normalized.includes("most important") || normalized.includes("priority")) {
-    if (stress >= 7) {
-      return "The top priority is improving recovery tonight with a simpler and calmer evening.";
-    }
-
-    if (fruitVeg <= 3 || data.mealRhythm !== "Regular meals") {
-      return "The top priority is improving meal consistency tomorrow, especially at lunch.";
-    }
-
-    return "The top priority is maintaining the habits that already worked well today.";
-  }
-
-  return "This check-in suggests a mostly stable day with a few manageable issues. A simple and consistent plan for tomorrow is the best next step.";
-}
-
-function ChatBubble({ message }: { message: ChatMessage }) {
-  const isUser = message.role === "user";
-
-  return (
-    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
-      <div
-        className={cn(
-          "max-w-[85%] rounded-3xl px-4 py-3 text-sm leading-6 shadow-sm",
-          isUser
-            ? "rounded-br-md bg-[var(--checkin-brand)] text-white"
-            : "rounded-bl-md border border-[var(--checkin-border)] bg-white text-foreground"
-        )}
-      >
-        {message.content}
-      </div>
-    </div>
-  );
-}
-
 export default function DailyCheckInPage() {
   const pageRef = useRef<HTMLElement | null>(null);
+  const router = useRouter();
   const [dietQuality, setDietQuality] = useState("Balanced with a few treats");
   const [mealRhythm, setMealRhythm] = useState("Mostly regular");
   const [fruitVeg, setFruitVeg] = useState("4");
@@ -245,8 +183,6 @@ export default function DailyCheckInPage() {
   const [submittedCheckIn, setSubmittedCheckIn] = useState<SubmittedCheckIn | null>(
     null
   );
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState("");
 
   const answeredFields = [
     dietQuality,
@@ -332,43 +268,31 @@ export default function DailyCheckInPage() {
       reflection,
     };
 
-    const recommendations = buildRecommendations(submission);
-
     setSubmittedCheckIn(submission);
-    setChatMessages([
-      {
-        id: "assistant-initial",
-        role: "assistant",
-        content: buildCoachIntro(submission, recommendations),
-      },
-    ]);
-    setChatInput("");
     requestAnimationFrame(() => {
       pageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   };
 
-  const handleSendChat = () => {
-    const trimmed = chatInput.trim();
-
-    if (!trimmed || !submittedCheckIn) {
+  const handleOpenChat = () => {
+    if (!submittedCheckIn) {
       return;
     }
 
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: trimmed,
-    };
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(
+        "daily-checkin-chat-context",
+        JSON.stringify({
+          submittedCheckIn,
+          recommendations: submittedRecommendations,
+          intro: buildCoachIntro(submittedCheckIn, submittedRecommendations),
+          summaryTitle: "Stable overall",
+          summaryTheme: "Mild recovery strain",
+        })
+      );
+    }
 
-    const assistantMessage: ChatMessage = {
-      id: `assistant-${Date.now()}`,
-      role: "assistant",
-      content: getCoachReply(trimmed, submittedCheckIn),
-    };
-
-    setChatMessages((current) => [...current, userMessage, assistantMessage]);
-    setChatInput("");
+    router.push("/chat");
   };
 
   return (
@@ -891,78 +815,22 @@ export default function DailyCheckInPage() {
                 </CardContent>
               </CheckInSurfaceCard>
 
-              <CheckInSurfaceCard>
-                <CardHeader className="gap-4 px-6 pt-6 pb-5">
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={cn(
-                        "flex size-12 shrink-0 items-center justify-center rounded-2xl shadow-sm",
-                        checkInTheme.softBrandSurface
-                      )}
-                    >
-                      <MessageCircle className="size-5" />
-                    </div>
-                    <div>
-                        <CardTitle className="text-[1.7rem] tracking-[-0.06em]">
-                        Ask questions
-                      </CardTitle>
-                      <CardDescription className="mt-1 max-w-[31ch]">
-                        You can ask about the recommendations or next steps.
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4 px-6 pb-6">
-                  <div className="space-y-3 rounded-3xl bg-[var(--checkin-warm-surface)] p-4">
-                    {chatMessages.map((message) => (
-                      <ChatBubble key={message.id} message={message} />
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Why is hydration a focus?",
-                      "What should I prioritize tomorrow?",
-                      "Which activity would help most?",
-                    ].map((prompt) => (
-                      <button
-                        key={prompt}
-                        type="button"
-                        onClick={() => setChatInput(prompt)}
-                        className="rounded-full border border-[var(--checkin-border)] bg-white px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-[var(--checkin-brand-mint)]"
-                      >
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
-
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      handleSendChat();
-                    }}
-                    className="flex items-end gap-3"
-                  >
-                    <textarea
-                      value={chatInput}
-                      onChange={(event) => setChatInput(event.target.value)}
-                      className="min-h-24 flex-1 rounded-3xl border border-input bg-white px-4 py-3.5 text-sm leading-6 text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground/80 focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/15"
-                      placeholder="Ask about the recommendations or next steps."
-                    />
-                    <Button
-                      type="submit"
-                      className={cn(
-                        "h-12 rounded-2xl px-4",
-                        checkInTheme.brandButton
-                      )}
-                    >
-                      <Send className="size-4" />
-                      Ask
-                    </Button>
-                  </form>
-                </CardContent>
-              </CheckInSurfaceCard>
+              <div className="rounded-[2rem] border border-[var(--checkin-border)] bg-[var(--checkin-card)] p-5 shadow-lg shadow-[var(--checkin-shadow)] backdrop-blur-sm">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">
+                    Open recommendation chat
+                  </p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    Continue in chat to ask follow-up questions about today&apos;s recommendations.
+                  </p>
+                </div>
+                <Button
+                  className={cn("mt-4 h-12 w-full rounded-2xl", checkInTheme.brandButton)}
+                  onClick={handleOpenChat}
+                >
+                  Open chat
+                </Button>
+              </div>
             </div>
           </>
         )}

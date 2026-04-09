@@ -18,7 +18,7 @@ export function CheckInChoiceChips({
   value,
   onChange,
 }: {
-  options: string[];
+  options: readonly string[];
   value: string;
   onChange: (next: string) => void;
 }) {
