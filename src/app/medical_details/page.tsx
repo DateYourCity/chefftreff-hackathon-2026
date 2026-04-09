@@ -10,127 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { PastVisitsList } from "./past-visits-list";
-
-const visitHistory = [
-    {
-        id: "visit-11",
-        status: "upcoming",
-        date: "22 Apr 2026",
-        doctor: "Dr. Anna Keller",
-        specialty: "General Practice",
-        location: "Munich City Center",
-        summary: "Annual check-up and blood pressure review.",
-    },
-    {
-        id: "visit-12",
-        status: "upcoming",
-        date: "06 May 2026",
-        doctor: "Dr. Mehmet Yilmaz",
-        specialty: "Cardiology",
-        location: "Schwabing",
-        summary: "Repeat ECG follow-up to confirm palpitations have settled.",
-    },
-    {
-        id: "visit-01",
-        status: "past",
-        date: "08 Apr 2026",
-        doctor: "Dr. Anna Keller",
-        specialty: "General Practice",
-        location: "Munich City Center",
-        summary: "Annual check-up and blood pressure review.",
-    },
-    {
-        id: "visit-02",
-        status: "past",
-        date: "14 Feb 2026",
-        doctor: "Dr. Mehmet Yilmaz",
-        specialty: "Cardiology",
-        location: "Schwabing",
-        summary: "Follow-up for palpitations and ECG discussion.",
-    },
-    {
-        id: "visit-03",
-        status: "past",
-        date: "03 Dec 2025",
-        doctor: "Dr. Sophie Brandt",
-        specialty: "Dermatology",
-        location: "Maxvorstadt",
-        summary: "Skin screening and mole monitoring.",
-    },
-    {
-        id: "visit-04",
-        status: "past",
-        date: "21 Oct 2025",
-        doctor: "Dr. Lukas Werner",
-        specialty: "Orthopedics",
-        location: "Bogenhausen",
-        summary: "Knee pain assessment after running injury.",
-    },
-    {
-        id: "visit-05",
-        status: "past",
-        date: "12 Aug 2025",
-        doctor: "Dr. Clara Neumann",
-        specialty: "Gynecology",
-        location: "Haidhausen",
-        summary: "Routine preventive exam and lab referral.",
-    },
-    {
-        id: "visit-06",
-        status: "past",
-        date: "25 Jun 2025",
-        doctor: "Dr. Jonas Beck",
-        specialty: "ENT",
-        location: "Neuhausen",
-        summary: "Recurring sinus pressure and allergy symptoms.",
-    },
-    {
-        id: "visit-07",
-        status: "past",
-        date: "09 Apr 2025",
-        doctor: "Dr. Eva Schmitt",
-        specialty: "Neurology",
-        location: "Glockenbachviertel",
-        summary: "Migraine consultation and medication adjustment.",
-    },
-    {
-        id: "visit-08",
-        status: "past",
-        date: "17 Jan 2025",
-        doctor: "Dr. David Roth",
-        specialty: "Gastroenterology",
-        location: "Sendling",
-        summary: "Digestive complaints and nutrition advice.",
-    },
-    {
-        id: "visit-09",
-        status: "past",
-        date: "04 Nov 2024",
-        doctor: "Dr. Miriam Vogel",
-        specialty: "Ophthalmology",
-        location: "Lehel",
-        summary: "Vision check and dry eye treatment plan.",
-    },
-    {
-        id: "visit-10",
-        status: "past",
-        date: "28 Aug 2024",
-        doctor: "Dr. Felix Braun",
-        specialty: "Endocrinology",
-        location: "Isarvorstadt",
-        summary: "Thyroid lab review and long-term monitoring.",
-    },
-];
-
-const futureAppointmentProposals = [
-    {
-        id: "proposal-01",
-        timeframe: "Suggested for May 2026",
-        doctor: "Dr. Mehmet Yilmaz",
-        specialty: "Cardiology",
-        reason: "Repeat ECG and check whether the palpitations have fully settled.",
-    },
-];
+import { futureAppointmentProposals, visitHistory } from "./visit-data";
 
 type HealthDocsPageProps = PageProps<"/medical_details">;
 
@@ -272,6 +152,9 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     <h3 className="mt-1 text-lg font-semibold text-foreground">
                                         Next appointments
                                     </h3>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Tap an appointment to open the detailed visit view.
+                                    </p>
                                 </div>
                                 <span className="inline-flex rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">
                                     {upcomingVisits.length}
@@ -280,12 +163,14 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
 
                             <div className="mt-4 space-y-3">
                                 {upcomingVisits.map((visit) => (
-                                    <article
+                                <Link
                                         key={visit.id}
-                                        className="rounded-[22px] border border-emerald-200 bg-white px-4 py-4"
+                                    href={`/medical_details/visit/${visit.id}`}
+                                    className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                                     >
+                                    <article className="rounded-[22px] border border-emerald-200 bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-emerald-300 group-hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]">
                                         <div className="flex items-start gap-3">
-                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 transition-colors group-hover:bg-emerald-200">
                                                 <CalendarDays className="h-5 w-5" />
                                             </div>
                                             <div className="min-w-0 flex-1">
@@ -306,10 +191,15 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                                                     {visit.summary}
                                                 </p>
+                                                <div className="mt-4 flex items-center justify-between rounded-full bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors group-hover:bg-emerald-100">
+                                                    <span>View details</span>
+                                                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                                </div>
                                             </div>
                                         </div>
                                     </article>
-                                ))}
+                                </Link>
+                            ))}
                             </div>
                         </section>
 
@@ -322,6 +212,9 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                                     <h3 className="mt-1 text-lg font-semibold text-foreground">
                                         Previous appointments
                                     </h3>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Tap any appointment to review the visit record.
+                                    </p>
                                 </div>
                                 <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
                                     {pastVisits.length}
