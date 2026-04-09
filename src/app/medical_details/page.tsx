@@ -146,6 +146,15 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                     >
                         <Stethoscope className="h-4 w-4 shrink-0" />
                         Doctor Visits
+                        <span
+                            className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${
+                                activeTab === "visits"
+                                    ? "bg-white/20 text-white"
+                                    : "bg-primary text-white"
+                            }`}
+                        >
+                            {futureAppointmentProposals.length}
+                        </span>
                     </Link>
                 </div>
             </div>
