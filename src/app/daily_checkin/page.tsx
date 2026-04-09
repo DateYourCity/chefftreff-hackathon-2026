@@ -5,7 +5,6 @@ import {
   Apple,
   ArrowLeft,
   Brain,
-  Check,
   Dumbbell,
   Droplets,
   MoonStar,
@@ -16,16 +15,15 @@ import {
   CheckInChoiceChips,
   CheckInSectionCard,
   CheckInSurfaceCard,
+  ServingRating,
   WaterGlassRating,
 } from "@/components/check-in/check-in-ui";
 import { checkInTheme, checkInThemeVars } from "@/components/check-in/theme";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 const habitOptions = {
@@ -298,27 +296,27 @@ export default function DailyCheckInPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2.5">
-                <Label htmlFor="fruit-veg" className="text-sm font-semibold">
+                <Label className="text-sm font-semibold">
                   Fruit + veg servings
                 </Label>
-                <Input
-                  id="fruit-veg"
-                  inputMode="decimal"
-                  value={fruitVeg}
-                  onChange={(event) => setFruitVeg(event.target.value)}
-                  className="bg-[#fcfcfa]"
+                <ServingRating
+                  value={Number(fruitVeg) || 0}
+                  onChange={(next) => setFruitVeg(String(next))}
                 />
               </div>
               <div className="rounded-3xl bg-[var(--checkin-warm-surface)] p-5">
                 <p className="text-xs font-medium tracking-[0.18em] text-[var(--checkin-warm-text)] uppercase">
                   Survey mapping
                 </p>
-                <p className="mt-2.5 text-sm font-semibold text-foreground">
-                  `diet_quality_score`
+                <p className="mt-2.5 text-3xl font-semibold tracking-[-0.06em] text-foreground">
+                  {fruitVeg || "0"}
                 </p>
-                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
-                  This section also supports `fruit_veg_servings_daily`.
+                <p className="mt-1.5 text-sm font-semibold text-foreground">
+                  servings today
                 </p>
+                {/*<p className="mt-2 text-sm leading-5 text-muted-foreground">
+                  Maps to `fruit_veg_servings_daily` alongside diet quality.
+                </p>*/}
               </div>
             </div>
           </CheckInSectionCard>
