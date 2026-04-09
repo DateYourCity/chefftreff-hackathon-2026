@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, ExternalLink, FileText } from "lucide-react";
+import { ChevronLeft, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { getHealthDocs } from "@/lib/health-docs";
 
 export async function generateStaticParams() {
@@ -46,14 +46,23 @@ export default async function HealthDocViewerPage(
             </div>
 
             <div className="flex flex-1 flex-col gap-3 p-4">
-                <Link
-                    href={pdfUrl}
-                    target="_blank"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
-                >
-                    Open PDF in new tab
-                    <ExternalLink className="h-4 w-4" />
-                </Link>
+                <div className="grid grid-cols-2 gap-3">
+                    <Link
+                        href={`/chat?source=health-docs&document=${encodeURIComponent(doc.id)}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90"
+                    >
+                        Explain by Coach
+                        <Sparkles className="h-4 w-4" />
+                    </Link>
+                    <Link
+                        href={pdfUrl}
+                        target="_blank"
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+                    >
+                        Open PDF
+                        <ExternalLink className="h-4 w-4" />
+                    </Link>
+                </div>
 
                 <div className="flex-1 overflow-hidden rounded-[28px] border border-border/70 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
                     <iframe
