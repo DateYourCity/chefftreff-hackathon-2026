@@ -5,19 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    Database,
     FileText,
     Home,
-    Menu,
     MessageCircle,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export interface NavbarProps extends React.ComponentPropsWithoutRef<"header"> {
@@ -58,11 +50,6 @@ const primaryNavItems: NavItem[] = [
     },
 ];
 
-const secondaryNavItems = [
-    { href: "/daily_checkin", label: "Daily Check-in", icon: Database },
-    { href: "/data_connections", label: "Data Connections", icon: Database },
-];
-
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     ({ className, ...props }, ref) => {
         return (
@@ -95,37 +82,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                             </p>
                         </div>
                     </Link>
-
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-10 w-10 rounded-full border-border/70 bg-background/80"
-                                aria-label="Open navigation menu"
-                            >
-                                <Menu className="h-4 w-4" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent align="end" className="w-56 rounded-2xl p-2">
-                            <div className="space-y-1">
-                                {secondaryNavItems.map((item) => {
-                                    const Icon = item.icon;
-
-                                    return (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/85 transition-colors hover:bg-muted hover:text-foreground"
-                                        >
-                                            <Icon className="h-4 w-4 text-muted-foreground" />
-                                            <span>{item.label}</span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
                 </div>
             </header>
         );

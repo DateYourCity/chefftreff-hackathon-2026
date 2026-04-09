@@ -163,7 +163,7 @@ export default function DataConnectionsPage() {
 
                 {allConnected ? (
                     <Button asChild className="mt-4 h-10 w-full rounded-full text-sm font-semibold">
-                        <Link href="/home">
+                        <Link href="/avatar/intro">
                             Show me my avatar
                             <ArrowRight className="h-4 w-4" />
                         </Link>

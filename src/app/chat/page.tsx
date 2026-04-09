@@ -141,15 +141,15 @@ function getMedicalDocumentReply(
         return `${context.document.summary} The best first step is to review ${context.document.focusAreas[0]?.toLowerCase() ?? "the key findings"}.`;
     }
 
-  if (
-    normalized.includes("flag") ||
-    normalized.includes("abnormal") ||
-    normalized.includes("result") ||
-    normalized.includes("glucose") ||
-    normalized.includes("sugar")
-  ) {
-    return `The main point is not that 98 mg/dL is high on its own. It is that your fasting glucose appears to have moved up from a usual baseline of 85 mg/dL, which can be an early signal worth following.`;
-  }
+    if (
+        normalized.includes("flag") ||
+        normalized.includes("abnormal") ||
+        normalized.includes("result") ||
+        normalized.includes("glucose") ||
+        normalized.includes("sugar")
+    ) {
+        return `The main point is not that 98 mg/dL is high on its own. It is that your fasting glucose appears to have moved up from a usual baseline of 85 mg/dL, which can be an early signal worth following.`;
+    }
 
     if (
         normalized.includes("question") ||
@@ -340,6 +340,7 @@ export default function ChatPage() {
                     id: `${parsed.kind}-intro`,
                     role: "assistant",
                     content: parsed.intro,
+                    actions: parsed.introActions,
                 },
             ]);
             window.sessionStorage.removeItem(CHAT_CONTEXT_STORAGE_KEY);
@@ -531,75 +532,75 @@ export default function ChatPage() {
                             ))}
                         </div>
 
-            {context.kind === "medical-document" && (
-              <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    {context.document.label}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {context.document.summary}
-                  </p>
-                </div>
+                        {context.kind === "medical-document" && (
+                            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/90 p-3">
+                                <div>
+                                    <p className="text-sm font-semibold text-slate-900">
+                                        {context.document.label}
+                                    </p>
+                                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                                        {context.document.summary}
+                                    </p>
+                                </div>
 
-                {context.document.keyStats && context.document.keyStats.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {context.document.keyStats.map((item) => (
-                      <div
-                        key={item.label}
-                        className={cn(
-                          "rounded-2xl px-3 py-2 ring-1",
-                          item.tone === "negative"
-                            ? "bg-rose-50 ring-rose-200"
-                            : "bg-white ring-slate-200"
-                        )}
-                      >
-                        <p
-                          className={cn(
-                            "text-[11px] font-semibold uppercase tracking-[0.12em]",
-                            item.tone === "negative"
-                              ? "text-rose-600"
-                              : "text-slate-500"
-                          )}
-                        >
-                          {item.label}
-                        </p>
-                        <p
-                          className={cn(
-                            "mt-1 text-sm font-semibold",
-                            item.tone === "negative"
-                              ? "text-rose-700"
-                              : "text-slate-900"
-                          )}
-                        >
-                          {item.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                                {context.document.keyStats && context.document.keyStats.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {context.document.keyStats.map((item) => (
+                                            <div
+                                                key={item.label}
+                                                className={cn(
+                                                    "rounded-2xl px-3 py-2 ring-1",
+                                                    item.tone === "negative"
+                                                        ? "bg-rose-50 ring-rose-200"
+                                                        : "bg-white ring-slate-200"
+                                                )}
+                                            >
+                                                <p
+                                                    className={cn(
+                                                        "text-[11px] font-semibold uppercase tracking-[0.12em]",
+                                                        item.tone === "negative"
+                                                            ? "text-rose-600"
+                                                            : "text-slate-500"
+                                                    )}
+                                                >
+                                                    {item.label}
+                                                </p>
+                                                <p
+                                                    className={cn(
+                                                        "mt-1 text-sm font-semibold",
+                                                        item.tone === "negative"
+                                                            ? "text-rose-700"
+                                                            : "text-slate-900"
+                                                    )}
+                                                >
+                                                    {item.value}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
-                {context.document.riskCallout && (
-                  <div
-                    className={cn(
-                      "rounded-2xl border px-3 py-2.5",
-                      context.document.riskTone === "negative"
-                        ? "border-rose-200 bg-rose-50"
-                        : "border-amber-200 bg-amber-50"
-                    )}
-                  >
-                    <p
-                      className={cn(
-                        "text-sm font-medium",
-                        context.document.riskTone === "negative"
-                          ? "text-rose-800"
-                          : "text-amber-900"
-                      )}
-                    >
-                      {context.document.riskCallout}
-                    </p>
-                  </div>
-                )}
+                                {context.document.riskCallout && (
+                                    <div
+                                        className={cn(
+                                            "rounded-2xl border px-3 py-2.5",
+                                            context.document.riskTone === "negative"
+                                                ? "border-rose-200 bg-rose-50"
+                                                : "border-amber-200 bg-amber-50"
+                                        )}
+                                    >
+                                        <p
+                                            className={cn(
+                                                "text-sm font-medium",
+                                                context.document.riskTone === "negative"
+                                                    ? "text-rose-800"
+                                                    : "text-amber-900"
+                                            )}
+                                        >
+                                            {context.document.riskCallout}
+                                        </p>
+                                    </div>
+                                )}
 
                                 <div className="flex flex-wrap gap-2">
                                     {context.document.focusAreas.map((item) => (

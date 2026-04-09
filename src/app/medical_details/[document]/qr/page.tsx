@@ -41,7 +41,10 @@ export default async function MedicalDocumentQrPage(
     return (
         <section className="fixed inset-0 z-[120] flex flex-col bg-white animate-in fade-in duration-300">
             <div className="flex-1 bg-white" />
-            <div className="mx-auto w-full max-w-[58vw] animate-in fade-in zoom-in-95 duration-500 delay-75 sm:max-w-[50vw]">
+            <div
+                className="mx-auto w-full animate-in fade-in zoom-in-95 duration-500 delay-75"
+                style={{ maxWidth: "calc(min(var(--app-frame-width), 100vw - 24px) - (var(--app-bezel) * 2))" }}
+            >
                 <QrReturnLink href={documentHref} imageSrc={qrSource} label={doc.label} />
             </div>
             <div className="flex-1 bg-white" />
