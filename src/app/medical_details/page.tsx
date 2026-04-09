@@ -17,7 +17,7 @@ type HealthDocsPageProps = PageProps<"/medical_details">;
 export default async function HealthDocsPage(props: HealthDocsPageProps) {
     const docs = await getHealthDocs();
     const searchParams = await props.searchParams;
-    const activeTab = searchParams.tab === "visits" ? "visits" : "documents";
+    const activeTab = searchParams.tab === "documents" ? "documents" : "visits";
     const upcomingVisits = visitHistory.filter((visit) => visit.status === "upcoming");
     const pastVisits = visitHistory.filter((visit) => visit.status === "past");
 
@@ -58,7 +58,7 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                         </span>
                     </Link>
                     <Link
-                        href="/medical_details"
+                        href="/medical_details?tab=documents"
                         className={`flex items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-center text-sm font-semibold transition-colors ${activeTab === "documents"
                                 ? "bg-primary text-white"
                                 : "text-muted-foreground hover:bg-primary/5 hover:text-foreground"
