@@ -24,6 +24,51 @@ function toNumber(value: string | undefined): number | null {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
+function clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
+}
+
+function average(values: Array<number | null>): number | null {
+    const validValues = values.filter((value): value is number => value !== null);
+    if (validValues.length === 0) {
+        return null;
+    }
+
+    return validValues.reduce((sum, value) => sum + value, 0) / validValues.length;
+}
+
+type InsightTone = "good" | "warn" | "bad";
+
+function getTone(value: number, goodMin: number, warnMin: number): InsightTone {
+    if (value >= goodMin) {
+        return "good";
+    }
+
+    if (value >= warnMin) {
+        return "warn";
+    }
+
+    return "bad";
+}
+
+const toneStyles: Record<InsightTone, { badge: string; bar: string; label: string }> = {
+    good: {
+        badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        bar: "bg-emerald-500",
+        label: "On track",
+    },
+    warn: {
+        badge: "bg-amber-100 text-amber-800 border-amber-200",
+        bar: "bg-amber-500",
+        label: "Needs attention",
+    },
+    bad: {
+        badge: "bg-rose-100 text-rose-800 border-rose-200",
+        bar: "bg-rose-500",
+        label: "Off track",
+    },
+};
+
 const animationOptions = [
     { id: "neutral-idle", label: "Neutral Idle", modelPath: "/models/Neutral Idle.dae" },
     { id: "sad-walk", label: "Sad Walk", modelPath: "/models/Sad Walk.dae" },
@@ -47,39 +92,124 @@ export default function HomePage() {
     );
 
     const healthInsights = useMemo(() => {
-        const ehr = tableRowToRecord(userData.ehr as CompactTable, 0);
-        const lifestyle = tableRowToRecord(userData.life as CompactTable, 0);
-        const wearRows = (userData.wear as CompactTable).v;
+        const wearTable = userData.wear as CompactTable;
+        const wearRows = wearTable.v;
+        const latestIndex = Math.max(wearRows.length - 1, 0);
+        const latest = tableRowToRecord(wearTable, latestIndex);
+        const recentRows = wearRows.slice(-7);
+        const latestDate = latest.date
+            ? new Date(latest.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+            : "-";
 
-        const latestWearRecord = tableRowToRecord(userData.wear as CompactTable, Math.max(wearRows.length - 1, 0));
-        const recentWearRows = wearRows.slice(-7);
+        const pickMetric = (columnName: string, row: string[]) => {
+            const metricIndex = wearTable.c.indexOf(columnName);
+            if (metricIndex < 0) {
+                return null;
+            }
 
-        const stepsIndex = (userData.wear as CompactTable).c.indexOf("steps");
-        const avgSteps7d =
-            stepsIndex >= 0 && recentWearRows.length > 0
-                ? Math.round(
-                    recentWearRows.reduce((sum, row) => sum + (toNumber(row[stepsIndex]) ?? 0), 0) /
-                    recentWearRows.length
-                )
-                : null;
+            return toNumber(row[metricIndex]);
+        };
 
-        const hba1c = toNumber(ehr.hba1c_pct);
-        const sleepHours = toNumber(latestWearRecord.sleep_duration_hrs);
-        const activitySessions = toNumber(lifestyle.exercise_sessions_weekly);
+        const avgSteps7d = average(recentRows.map((row) => pickMetric("steps", row)));
+        const avgSleep7d = average(recentRows.map((row) => pickMetric("sleep_duration_hrs", row)));
+        const avgRhr7d = average(recentRows.map((row) => pickMetric("resting_hr_bpm", row)));
+        const avgHrv7d = average(recentRows.map((row) => pickMetric("hrv_rmssd_ms", row)));
+
+        const latestSteps = toNumber(latest.steps);
+        const latestSleep = toNumber(latest.sleep_duration_hrs);
+        const latestSleepQuality = toNumber(latest.sleep_quality_score);
+        const latestRhr = toNumber(latest.resting_hr_bpm);
+        const latestHrv = toNumber(latest.hrv_rmssd_ms);
+        const latestActiveMinutes = toNumber(latest.active_minutes);
+
+        const stepsTone = latestSteps ? getTone(latestSteps, 7000, 5000) : "warn";
+        const sleepTone = latestSleep ? getTone(latestSleep, 7, 6) : "warn";
+        const activeTone = latestActiveMinutes ? getTone(latestActiveMinutes, 20, 12) : "warn";
+
+        const hrvTone: InsightTone = latestHrv
+            ? latestHrv >= 25
+                ? "good"
+                : latestHrv >= 22
+                    ? "warn"
+                    : "bad"
+            : "warn";
+
+        const hrTone: InsightTone = latestRhr
+            ? latestRhr <= 80
+                ? "good"
+                : latestRhr <= 88
+                    ? "warn"
+                    : "bad"
+            : "warn";
+
+        const qualityTone: InsightTone = latestSleepQuality
+            ? latestSleepQuality >= 70
+                ? "good"
+                : latestSleepQuality >= 55
+                    ? "warn"
+                    : "bad"
+            : "warn";
+
+        const sleepNorm = latestSleep ? clamp(1 - Math.abs(latestSleep - 7.5) / 2.5, 0, 1) : 0.5;
+        const qualityNorm = latestSleepQuality ? clamp(latestSleepQuality / 100, 0, 1) : 0.5;
+        const hrvNorm = latestHrv ? clamp((latestHrv - 15) / 20, 0, 1) : 0.5;
+        const hrNorm = latestRhr ? clamp((95 - latestRhr) / 20, 0, 1) : 0.5;
+        const recoveryScore = Math.round((sleepNorm * 0.25 + qualityNorm * 0.35 + hrvNorm * 0.2 + hrNorm * 0.2) * 100);
+
+        const recoveryTone: InsightTone = recoveryScore >= 75 ? "good" : recoveryScore >= 55 ? "warn" : "bad";
+        const gaugeColor = recoveryTone === "good" ? "#10b981" : recoveryTone === "warn" ? "#f59e0b" : "#f43f5e";
 
         return {
-            demographics: `Age ${ehr.age ?? "-"}, BMI ${ehr.bmi ?? "-"}, ${ehr.country ?? "-"}`,
-            glucose: hba1c
-                ? `HbA1c ${hba1c.toFixed(1)}% (${hba1c >= 7 ? "above target" : "in range"})`
-                : "HbA1c unavailable",
-            activity: avgSteps7d
-                ? `7-day average ${avgSteps7d.toLocaleString()} steps/day, ${activitySessions ?? "-"} exercise sessions/week`
-                : "Activity data unavailable",
-            recovery: sleepHours
-                ? `Latest sleep ${sleepHours.toFixed(1)}h, quality ${latestWearRecord.sleep_quality_score ?? "-"}/100`
-                : "Sleep data unavailable",
-            cardio: `Resting HR ${latestWearRecord.resting_hr_bpm ?? "-"} bpm, HRV ${latestWearRecord.hrv_rmssd_ms ?? "-"} ms`,
-            conditions: (ehr.chronic_conditions ?? "").split("|").join(", "),
+            latestDate,
+            recoveryScore,
+            recoveryTone,
+            gaugeStyle: {
+                background: `conic-gradient(${gaugeColor} ${recoveryScore * 3.6}deg, #d1fae5 0deg)`,
+            },
+            metrics: [
+                {
+                    title: "Steps",
+                    value: latestSteps ? `${latestSteps.toLocaleString()} today` : "No data",
+                    sub: avgSteps7d ? `7d avg ${Math.round(avgSteps7d).toLocaleString()}` : "",
+                    progress: latestSteps ? clamp((latestSteps / 10000) * 100, 0, 100) : 0,
+                    tone: stepsTone,
+                },
+                {
+                    title: "Sleep",
+                    value: latestSleep ? `${latestSleep.toFixed(1)}h` : "No data",
+                    sub: avgSleep7d ? `7d avg ${avgSleep7d.toFixed(1)}h` : "",
+                    progress: latestSleep ? clamp((latestSleep / 8.5) * 100, 0, 100) : 0,
+                    tone: sleepTone,
+                },
+                {
+                    title: "Active Minutes",
+                    value: latestActiveMinutes ? `${latestActiveMinutes} min` : "No data",
+                    sub: "Target 20+ min",
+                    progress: latestActiveMinutes ? clamp((latestActiveMinutes / 30) * 100, 0, 100) : 0,
+                    tone: activeTone,
+                },
+                {
+                    title: "Sleep Quality",
+                    value: latestSleepQuality ? `${Math.round(latestSleepQuality)}/100` : "No data",
+                    sub: "Higher is better",
+                    progress: latestSleepQuality ? clamp(latestSleepQuality, 0, 100) : 0,
+                    tone: qualityTone,
+                },
+                {
+                    title: "Resting HR",
+                    value: latestRhr ? `${Math.round(latestRhr)} bpm` : "No data",
+                    sub: avgRhr7d ? `7d avg ${Math.round(avgRhr7d)} bpm` : "",
+                    progress: latestRhr ? clamp(((100 - latestRhr) / 30) * 100, 0, 100) : 0,
+                    tone: hrTone,
+                },
+                {
+                    title: "HRV",
+                    value: latestHrv ? `${latestHrv.toFixed(1)} ms` : "No data",
+                    sub: avgHrv7d ? `7d avg ${avgHrv7d.toFixed(1)} ms` : "",
+                    progress: latestHrv ? clamp(((latestHrv - 15) / 20) * 100, 0, 100) : 0,
+                    tone: hrvTone,
+                },
+            ],
         };
     }, []);
 
@@ -203,24 +333,49 @@ export default function HomePage() {
                         <div className="mx-auto h-1.5 w-12 rounded-full bg-emerald-300" />
                         <div className="mt-3 flex items-center justify-between">
                             <h2 className="text-base font-semibold text-emerald-950">Hi Thomas!</h2>
+                            <p className="text-xs font-medium text-emerald-700/80">Latest sync: 09:35</p>
                         </div>
                     </div>
 
                     <div className="space-y-3 px-5 pb-6">
-                        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Profile snapshot</p>
-                            <p className="mt-1 text-sm text-emerald-950">{healthInsights.demographics}</p>
-                            <p className="mt-1 text-sm text-emerald-950">Conditions: {healthInsights.conditions || "None listed"}</p>
+                        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 p-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700/80">Recovery gauge</p>
+                                    <p className="mt-1 text-sm text-emerald-900">Based on sleep, quality, resting HR, and HRV.</p>
+                                </div>
+                                <div className="relative grid h-20 w-20 place-items-center rounded-full p-1" style={healthInsights.gaugeStyle}>
+                                    <div className="grid h-full w-full place-items-center rounded-full bg-white">
+                                        <span className="text-lg font-bold text-emerald-950">{healthInsights.recoveryScore}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${toneStyles[healthInsights.recoveryTone].badge}`}>
+                                {toneStyles[healthInsights.recoveryTone].label}
+                            </div>
                         </div>
-                        <div className="rounded-2xl border border-teal-100 bg-teal-50/70 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-700/80">Metabolic insight</p>
-                            <p className="mt-1 text-sm text-teal-950">{healthInsights.glucose}</p>
-                        </div>
-                        <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-700/80">Movement and recovery</p>
-                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.activity}</p>
-                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.recovery}</p>
-                            <p className="mt-1 text-sm text-cyan-950">{healthInsights.cardio}</p>
+
+                        <div className="grid grid-cols-1 gap-3">
+                            {healthInsights.metrics.map((metric) => (
+                                <div key={metric.title} className="rounded-2xl border border-slate-200/80 bg-white p-3">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{metric.title}</p>
+                                            <p className="mt-1 text-sm font-semibold text-slate-900">{metric.value}</p>
+                                            {metric.sub ? <p className="mt-0.5 text-xs text-slate-500">{metric.sub}</p> : null}
+                                        </div>
+                                        <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${toneStyles[metric.tone].badge}`}>
+                                            {toneStyles[metric.tone].label}
+                                        </span>
+                                    </div>
+                                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                                        <div
+                                            className={`h-full rounded-full transition-all ${toneStyles[metric.tone].bar}`}
+                                            style={{ width: `${metric.progress}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
