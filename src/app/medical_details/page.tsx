@@ -138,6 +138,8 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
     const activeTab = searchParams.tab === "visits" ? "visits" : "documents";
     const upcomingVisits = visitHistory.filter((visit) => visit.status === "upcoming");
     const pastVisits = visitHistory.filter((visit) => visit.status === "past");
+    const visiblePastVisits = pastVisits.slice(0, 3);
+    const hiddenPastVisits = pastVisits.slice(3);
 
     return (
         <section className="min-h-full bg-[linear-gradient(180deg,#f8f5eb_0%,#f4f6fb_52%,#eef3f8_100%)] px-4 py-5">
@@ -320,37 +322,85 @@ export default async function HealthDocsPage(props: HealthDocsPageProps) {
                             </div>
 
                             <div className="mt-4 space-y-3">
-                                {pastVisits.map((visit) => (
+                                {visiblePastVisits.map((visit) => (
                                     <article
                                         key={visit.id}
-                                    className="rounded-[22px] border border-border/70 bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
-                                            <Stethoscope className="h-5 w-5" />
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <CalendarDays className="h-4 w-4" />
-                                                <span>{visit.date}</span>
+                                        className="rounded-[22px] border border-border/70 bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+                                                <Stethoscope className="h-5 w-5" />
                                             </div>
-                                            <h2 className="mt-2 text-base font-semibold text-foreground">
-                                                {visit.doctor}
-                                            </h2>
-                                            <p className="text-sm font-medium text-primary">
-                                                {visit.specialty}
-                                            </p>
-                                            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                                                <MapPin className="h-4 w-4" />
-                                                <span>{visit.location}</span>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <CalendarDays className="h-4 w-4" />
+                                                    <span>{visit.date}</span>
+                                                </div>
+                                                <h2 className="mt-2 text-base font-semibold text-foreground">
+                                                    {visit.doctor}
+                                                </h2>
+                                                <p className="text-sm font-medium text-primary">
+                                                    {visit.specialty}
+                                                </p>
+                                                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <MapPin className="h-4 w-4" />
+                                                    <span>{visit.location}</span>
+                                                </div>
+                                                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                                                    {visit.summary}
+                                                </p>
                                             </div>
-                                            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                                                {visit.summary}
-                                            </p>
                                         </div>
-                                    </div>
-                                </article>
-                            ))}
+                                    </article>
+                                ))}
+
+                                {hiddenPastVisits.length > 0 ? (
+                                    <details className="group rounded-[22px] border border-dashed border-border/80 bg-muted/20 px-4 py-4 open:bg-white">
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-foreground">
+                                            <span>Show more</span>
+                                            <span className="text-xs font-medium text-muted-foreground group-open:hidden">
+                                                {hiddenPastVisits.length} hidden
+                                            </span>
+                                            <span className="hidden text-xs font-medium text-muted-foreground group-open:inline">
+                                                Hide extra visits
+                                            </span>
+                                        </summary>
+
+                                        <div className="mt-3 space-y-3">
+                                            {hiddenPastVisits.map((visit) => (
+                                                <article
+                                                    key={visit.id}
+                                                    className="rounded-[22px] border border-border/70 bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+                                                            <Stethoscope className="h-5 w-5" />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                <CalendarDays className="h-4 w-4" />
+                                                                <span>{visit.date}</span>
+                                                            </div>
+                                                            <h2 className="mt-2 text-base font-semibold text-foreground">
+                                                                {visit.doctor}
+                                                            </h2>
+                                                            <p className="text-sm font-medium text-primary">
+                                                                {visit.specialty}
+                                                            </p>
+                                                            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                                                                <MapPin className="h-4 w-4" />
+                                                                <span>{visit.location}</span>
+                                                            </div>
+                                                            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                                                                {visit.summary}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </article>
+                                            ))}
+                                        </div>
+                                    </details>
+                                ) : null}
                             </div>
                         </section>
                 </div>
