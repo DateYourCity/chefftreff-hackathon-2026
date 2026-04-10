@@ -1,9 +1,9 @@
-# Chaeffchen
-
-[Watch the app presentation](submission/App%20Presentation.mp4)  
-[Open the slide deck](submission/Ch%C3%A4ffchenXBcg.pptx)
-
+# Chäffchen: Better You - Connect the Dots
 **Better You** is a health companion App built for the Cheftreff Hackathon 2026.
+
+📹 [Watch the app presentation](submission/App%20Presentation.mp4)  
+
+📄 [Open the slide deck](submission/Ch%C3%A4ffchenXBcg.pptx)
 
 ## Setup
 
